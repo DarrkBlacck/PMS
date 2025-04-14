@@ -9,4 +9,4 @@ services:
     command: sleep infinity
     environment:
       - MONGODB_URI=${MONGODB_URI}
-      - NEXT_PUBLIC_API_BASE_URL="http://fictional-yodel-x77wwxg7pjhv4rw-8000.app.github.dev"
+      - NEXT_PUBLIC_API_BASE_URL= http://fictional-yodel-x77wwxg7pjhv4rw-8000.app.github.dev

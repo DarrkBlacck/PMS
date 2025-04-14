@@ -1,0 +1,21 @@
+
+> pms-frontend@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.2.5
+   - Local:        http://localhost:3000
+   - Network:      http://172.18.0.2:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+2025-04-14T15:56:52.299Z next:router-server:filesystem nextDataRoutes Set(0) {}
+2025-04-14T15:56:52.299Z next:router-server:filesystem dynamicRoutes []
+2025-04-14T15:56:52.300Z next:router-server:filesystem pageFiles Set(0) {}
+2025-04-14T15:56:52.300Z next:router-server:filesystem appFiles Set(0) {}
+2025-04-14T15:56:53.498Z next:jsconfig-paths-plugin tsconfig.json or jsconfig.json paths: { '@/*': [ './*' ], '@/components/*': [ 'app/components/*' ] }
+2025-04-14T15:56:53.498Z next:jsconfig-paths-plugin resolved baseUrl: { baseUrl: '/workspace/pms-frontend/src', isImplicit: false }
+2025-04-14T15:56:53.506Z next:jsconfig-paths-plugin tsconfig.json or jsconfig.json paths: { '@/*': [ './*' ], '@/components/*': [ 'app/components/*' ] }
+2025-04-14T15:56:53.506Z next:jsconfig-paths-plugin resolved baseUrl: { baseUrl: '/workspace/pms-frontend/src', isImplicit: false }
+2025-04-14T15:56:53.532Z next:jsconfig-paths-plugin tsconfig.json or jsconfig.json paths: { '@/*': [ './*' ], '@/components/*': [ 'app/components/*' ] }
+2025-04-14T15:56:53.532Z next:jsconfig-paths-plugin resolved baseUrl: { baseUrl: '/workspace/pms-frontend/src', isImplicit: false }
+ ✓ Ready in 3.6s
