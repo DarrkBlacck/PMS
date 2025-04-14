@@ -259,7 +259,7 @@ class GoogleFormPrefiller:
             'tenth_cgpa': [
                 'tenth cgpa', '10th', 'sslc', 'tenth grade', '10th grade',
                 'SSLC', 'TENTH', '10TH', 'X', 'tenth percentage',
-                'sslc marks', 'sslc grade', 'sslc cgpa', 'class x',
+                'sslc marks', 'sslc grade', 'sslc cgpa', 'SSLC cgpa', 'class x',
                 'CLASS X', 'SSLC PERCENTAGE', '10th marks', 'tenth marks'
             ],
             'twelth_cgpa': [
