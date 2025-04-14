@@ -1,7 +1,7 @@
-import requests #type: ignore
+import requests 
 import re
 import json
-from bs4 import BeautifulSoup #type: ignore
+from bs4 import BeautifulSoup 
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 
 class GoogleFormPrefiller:

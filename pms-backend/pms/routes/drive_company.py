@@ -1,9 +1,5 @@
-import re
 from fastapi import FastAPI, HTTPException, status, APIRouter
 from pms.models.drivecompany import DriveCompany
-from pymongo import ReturnDocument
-from typing import List
-from bson import ObjectId
 from pms.services.drivecompany_services import drive_company_mgr
 
 router = APIRouter()

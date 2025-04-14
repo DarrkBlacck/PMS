@@ -33,7 +33,8 @@ from pms.services.alumni_services import alumni_mgr
 
 origins = [
     "http://localhost:3000",  # Adjust this if your frontend runs on a different port
-    "http://127.0.0.1:3000"
+    "http://fictional-yodel-x77wwxg7pjhv4rw-8000.app.github.dev",  # Add frontend URL
+    "https://fictional-yodel-x77wwxg7pjhv4rw-8000.app.github.dev",
 ]
 
 db = DatabaseConnection()
@@ -65,7 +66,7 @@ async def options_handler(path: str):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],  # Allow all methods (GET, POST, OPTIONS, etc.)
     allow_headers=["*"],  # Allow all headers

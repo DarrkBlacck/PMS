@@ -5,7 +5,6 @@ import { Input,Button,Form } from "@heroui/react";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
-import { useCookies } from "react-cookie";
 import { useSearchParams } from "next/navigation";
 
 export default function Login() {
@@ -44,7 +43,6 @@ export default function Login() {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({email, password}),
-        credentials: 'include',
       });
       
       console.log("Response status:", response.status);
@@ -91,13 +89,16 @@ export default function Login() {
     }
   }
   }
-  catch(error: any){
-      toast.error(`Failed to login: ${error.message}`);
-      console.error('Failed to login:', error);
+  catch (err){
+
+    if ( err instanceof Error ){
+      toast.error(`Failed to login: ${err.message}`);
+      console.log(err.message);
+    } else {
+      toast.error(`Failed to login console`);
+      console.log("Unknown error",err);
     }
-    finally{
-      setLoading(false);
-    }
+  }
    };
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">

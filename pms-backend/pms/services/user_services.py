@@ -6,6 +6,7 @@ from pms.core.config import config
 from pms.services.auth_services import create_access_token
 from pms.utils.utilities import util_mgr
 from bson import ObjectId
+from fastapi import HTTPException, status
 
 class UserMgr:
     def __init__(self):
@@ -64,7 +65,10 @@ class UserMgr:
             )
             return {"access_token": access_token, "role": user_data["role"], "status": user_data["status"]}
         except Exception as e:
-            raise Exception(f"Error logging in: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={"error": str(e)}
+            )
         
     async def get_user(self, user_id: str):
         try:

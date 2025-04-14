@@ -2,7 +2,6 @@ from fastapi import FastAPI, HTTPException, status, APIRouter
 from pms.models.job import Job, JobUpdate
 from pymongo import ReturnDocument
 from typing import List
-from bson import ObjectId
 from pms.services.job_services import job_mgr
 
 router = APIRouter()
