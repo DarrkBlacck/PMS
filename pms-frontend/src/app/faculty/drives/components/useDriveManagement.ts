@@ -2,7 +2,7 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { fetchDriveByIdAPI, fetchCompaniesAPI, fetchCompaniesByDriveAPI, addDriveAPI, addCompanyAPI, updateCompanyAPI, addDriveCompanyAPI, addJobAPI, fetchJobsByDriveAPI, updateJobAPI, deleteJobAPI, deleteJobByDriveCompanyAPI, deleteJobByDriveAPI, deleteJobByCompanyAPI, deleteDriveAPI, deleteDriveCompanyByCompanyAPI, deleteDriveCompanyByDriveAPI, updateDriveAPI, addRequirementAPI, fetchRequirementsByJobAPI, updateRequirementAPI } from "./API";
+import { fetchDriveByIdAPI, fetchCompaniesAPI, fetchCompaniesByDriveAPI, addDriveAPI, addCompanyAPI, updateCompanyAPI, addDriveCompanyAPI, addJobAPI, fetchJobsByDriveAPI, updateJobAPI, deleteJobAPI, deleteJobByDriveCompanyAPI, deleteJobByDriveAPI, deleteDriveAPI, deleteDriveCompanyByCompanyAPI, deleteDriveCompanyByDriveAPI, updateDriveAPI, addRequirementAPI, fetchRequirementsByJobAPI, updateRequirementAPI } from "./API";
 
 export interface Drive {
     _id: string;

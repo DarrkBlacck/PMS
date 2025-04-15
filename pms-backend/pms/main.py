@@ -35,6 +35,8 @@ origins = [
     "http://localhost:3000",  # Adjust this if your frontend runs on a different port
     "http://fictional-yodel-x77wwxg7pjhv4rw-3000.app.github.dev",  # Add frontend URL
     "https://fictional-yodel-x77wwxg7pjhv4rw-3000.app.github.dev",
+    "http://fictional-yodel-x77wwxg7pjhv4rw-3001.app.github.dev",
+    "https://fictional-yodel-x77wwxg7pjhv4rw-3001.app.github.dev",
 ]
 
 db = DatabaseConnection()

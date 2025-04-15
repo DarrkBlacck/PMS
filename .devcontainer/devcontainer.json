@@ -9,9 +9,8 @@
       "extensions": [
         "ms-python.python",
         "esbenp.prettier-vscode",
-        "dbaeumer.vscode-eslint",
-        "github.copilot"
-      ]
+        "dbaeumer.vscode-eslint"
+            ]
     }
   }
 }
