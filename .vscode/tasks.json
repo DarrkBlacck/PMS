@@ -1,0 +1,35 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Restart Frontend",
+        "type": "shell",
+        "command": "/workspace/scripts/restart_frontend.sh",
+        "problemMatcher": []
+      },
+      {
+        "label": "Restart Backend",
+        "type": "shell",
+        "command": "/workspace/scripts/restart_backend.sh",
+        "problemMatcher": []
+      },
+      {
+        "label": "View Frontend Logs",
+        "type": "shell",
+        "command": "/workspace/scripts/view_logs.sh frontend",
+        "problemMatcher": []
+      },
+      {
+        "label": "View Backend Logs",
+        "type": "shell",
+        "command": "/workspace/scripts/view_logs.sh backend",
+        "problemMatcher": []
+      },
+      {
+        "label": "View All Logs",
+        "type": "shell",
+        "command": "/workspace/scripts/view_logs.sh",
+        "problemMatcher": []
+      }
+    ]
+  }

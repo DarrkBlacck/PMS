@@ -9,4 +9,34 @@ services:
     command: sleep infinity
     environment:
       - MONGODB_URI=${MONGODB_URI}
-      - NEXT_PUBLIC_API_BASE_URL= http://fictional-yodel-x77wwxg7pjhv4rw-8000.app.github.dev
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+  
+  backend:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace:cached
+    command: bash -c "cd /workspace/pms-backend && uvicorn pms.main:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+    depends_on:
+      - app
+    restart: unless-stopped  # Automatically restart if it crashes
+  
+  frontend:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ..:/workspace:cached
+    command: bash -c "cd /workspace/pms-frontend && npm run dev"
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+    depends_on:
+      - backend
+    restart: unless-stopped  # Automatically restart if it crashes

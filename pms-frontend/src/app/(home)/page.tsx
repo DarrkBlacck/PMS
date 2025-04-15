@@ -36,12 +36,12 @@ export default function Login() {
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`);
     try{
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
       {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
+        credentials: 'include',
         body: JSON.stringify({email, password}),
       });
       
