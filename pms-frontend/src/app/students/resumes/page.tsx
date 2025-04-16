@@ -1,8 +1,8 @@
 'use client';
 
 import { Button } from '@heroui/react';
-import { useState, useEffect } from 'react';
-import { FiUpload, FiPlus, FiEye, FiTrash2, FiDownload } from 'react-icons/fi';
+import { useState } from 'react';
+import {  FiPlus, FiEye, FiTrash2, FiDownload } from 'react-icons/fi';
 import { Resume } from '../components/types';
 import { useStudentManagement } from '../components/useStudentManagement';
 
@@ -32,7 +32,6 @@ export default function ResumesPage() {
         handleDeleteResume,
         // handleFetchStudentResumes, // Assuming this is implicitly called or handled by the hook
         // handleDownloadResume, // We won't use the hook's download function directly here
-        student
     } = useStudentManagement();
 
     // --- Client-side PDF Generation and Download ---

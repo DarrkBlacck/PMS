@@ -52,7 +52,7 @@ export default function EditResumePage() {
         };
 
         fetchResume();
-    }, [resumeId]);
+    }, [resumeId, handleFetchResumeById]);
 
     const handleSubmit = async () => {
         if (!resumeId) return;

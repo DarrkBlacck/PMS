@@ -217,3 +217,39 @@ export interface PrefillData {
   certification_files?: FileInfo[];
   job_application_files?: FileInfo[];
 }
+
+// Add these to your existing types.ts file
+
+export interface StudentForm {
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  address: string;
+  city: string;
+  district: string;
+  state: string;
+}
+
+export interface PersonalDetailsProps {
+  student: Student;
+  studentForm: StudentForm;
+  handleStudentFormChange: (field: string, value: string) => void;
+  handleEditStudent: (student: Student) => void;
+}
+
+export interface AcademicDetailsProps {
+  student: Student;
+}
+
+export interface DocumentsProps {
+  student: Student;
+  performance: Performance; // This should remain as is, but we'll handle null in page.tsx
+  handleFileUpload: (files: FileList, type: string, studentId: string, onProgress: (progress: number) => void) => Promise<void>;
+  handleDeleteDocument: (filepath: string, type: string) => Promise<void>;
+}
+
+export interface DeleteConfirmation {
+  show: boolean;
+  file: FileInfo | null;
+  type: 'certification' | 'job_application' | null;
+}

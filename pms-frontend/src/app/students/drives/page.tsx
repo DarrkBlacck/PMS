@@ -11,7 +11,6 @@ export default function DrivesPage() {
     driveLoading,
     driveError,
     handleViewDriveDetails,
-    handleApplyToJob,
     handleCloseDriveDetails
   } = useStudentManagement();
 

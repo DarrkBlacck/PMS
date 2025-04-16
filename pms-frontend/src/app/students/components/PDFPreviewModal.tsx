@@ -1,7 +1,6 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@heroui/react";
 import { useState } from "react";
 import PDFViewer from "./PDFViewer";
-import { MdDelete } from "react-icons/md";
 
 interface PDFPreviewModalProps {
   isOpen: boolean;
