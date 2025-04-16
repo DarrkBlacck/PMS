@@ -1,9 +1,10 @@
 // src/hooks/useCompanyManagement.ts
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify'; // Using toast for feedback
-import { Company, CompanyInputData, getCompanies, addCompany, updateCompany, deleteCompany } from './API'; // Importing API functions
-
+import { getCompanies, addCompany, updateCompany, deleteCompany } from './API'; // Importing API functions
+import { Company, CompanyInputData } from './types'; // Importing types
 // Define the shape of the state managed by the hook
+
 interface CompanyManagementState {
     companies: Company[];
     isLoading: boolean;
@@ -19,7 +20,14 @@ interface CompanyManagementState {
 
 // Initial state values
 const initialFormData: CompanyInputData = {
-    name: "", site: "", branch: "", desc: "", email: "", ph_no: "",
+    name: "", 
+    site: "",
+    branch: "", 
+    desc: "", 
+    email: null, 
+    ph_no: "",
+    avg_salary: 0,
+    placed_students: [],
 };
 
 /**
@@ -50,7 +58,9 @@ export const useCompanyManagement = () => {
             console.error("Error fetching companies:", err);
             const errorMessage = err instanceof Error ? err.message : "Failed to fetch companies.";
             setState(prev => ({ ...prev, error: errorMessage, isLoading: false }));
-            toast.error(`Error fetching companies: ${errorMessage}`);
+            toast.error(`Error fetching companies: ${errorMessage}`,{
+                position: 'bottom-left',
+            });
         }
     }, []);
 
@@ -79,8 +89,11 @@ export const useCompanyManagement = () => {
                 site: company.site || "",
                 branch: company.branch,
                 desc: company.desc || "",
-                email: company.email || "",
+                email: company.email || null,
                 ph_no: company.ph_no || "",
+                avg_salary: company.avg_salary || 0,
+                placed_students: company.placed_students || [],
+
             },
             error: null,
         }));
@@ -111,6 +124,8 @@ export const useCompanyManagement = () => {
         setState(prev => ({
             ...prev,
             formData: { ...prev.formData, [field]: value },
+
+            error: (field === 'name' || field === 'branch') ? null : prev.error
         }));
     }, []);
 
@@ -118,6 +133,9 @@ export const useCompanyManagement = () => {
         setState(prev => ({
             ...prev,
             editFormData: { ...prev.editFormData, [field]: value },
+
+            error: (field === 'name' || field === 'branch') ? null : prev.error
+
         }));
     }, []);
 
@@ -127,34 +145,65 @@ export const useCompanyManagement = () => {
     }, []);
 
     // --- CRUD Operations ---
+    // Modified submitNewCompany function with validation
     const submitNewCompany = useCallback(async () => {
+        // Form validation for required fields
+        if (!state.formData.name.trim()) {
+            setState(prev => ({ ...prev, error: "Company Name is required" }));
+            return;
+        }
+        
+        if (!state.formData.branch.trim()) {
+            setState(prev => ({ ...prev, error: "Branch is required" }));
+            return;
+        }
+        
         setState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
             await addCompany(state.formData);
-            toast.success("Company added successfully!");
+            toast.success("Company added successfully!", {
+                position: 'bottom-left',
+            });
             handleCloseModals();
             await fetchCompaniesData(); // Refresh data
         } catch (err) {
             console.error("Error adding company:", err);
             const errorMessage = err instanceof Error ? err.message : "Failed to add company.";
             setState(prev => ({ ...prev, error: errorMessage, isLoading: false }));
-            toast.error(`Error adding company: ${errorMessage}`);
+            toast.error(`Error adding company: ${errorMessage}`,{
+                position: 'bottom-left',
+            });
         }
     }, [state.formData, fetchCompaniesData, handleCloseModals]);
 
     const submitUpdatedCompany = useCallback(async () => {
+        // Form validation for required fields
+        if (!state.editFormData.name.trim()) {
+            setState(prev => ({ ...prev, error: "Company Name is required" }));
+            return;
+        }
+        
+        if (!state.editFormData.branch.trim()) {
+            setState(prev => ({ ...prev, error: "Branch is required" }));
+            return;
+        }
+        
         if (!state.currentCompany?._id) return;
         setState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
             await updateCompany(state.currentCompany._id, state.editFormData);
-            toast.success("Company updated successfully!");
+            toast.success("Company updated successfully!",{
+                position: 'bottom-left',
+            });
             handleCloseModals();
             await fetchCompaniesData(); // Refresh data
         } catch (err) {
             console.error("Error updating company:", err);
             const errorMessage = err instanceof Error ? err.message : "Failed to update company.";
             setState(prev => ({ ...prev, error: errorMessage, isLoading: false }));
-            toast.error(`Error updating company: ${errorMessage}`);
+            toast.error(`Error updating company: ${errorMessage}`, {
+                position: 'bottom-left',
+            });
         }
     }, [state.currentCompany, state.editFormData, fetchCompaniesData, handleCloseModals]);
 
@@ -163,14 +212,18 @@ export const useCompanyManagement = () => {
         setState(prev => ({ ...prev, isLoading: true, error: null }));
         try {
             await deleteCompany(state.currentCompany._id);
-            toast.success("Company deleted successfully!");
+            toast.success("Company deleted successfully!", {
+                position: 'bottom-left',
+            });
             handleCloseModals();
             await fetchCompaniesData(); // Refresh data
         } catch (err) {
             console.error("Error deleting company:", err);
             const errorMessage = err instanceof Error ? err.message : "Failed to delete company.";
             setState(prev => ({ ...prev, error: errorMessage, isLoading: false }));
-            toast.error(`Error deleting company: ${errorMessage}`);
+            toast.error(`Error deleting company: ${errorMessage}`, {
+                position: 'bottom-left',
+            });
         }
     }, [state.currentCompany, fetchCompaniesData, handleCloseModals]);
 

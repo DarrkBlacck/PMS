@@ -1,32 +1,6 @@
 // src/services/API.ts
 
-export interface Company {
-    _id: string;
-    name: string;
-    site?: string;
-    branch: string;
-    desc?: string;
-    email?: string;
-    ph_no?: string;
-    avg_salary?: number;
-    placed_students?: string[];
-}
-
-export interface CompanyInputData {
-    name: string;
-    site?: string;
-    branch: string;
-    desc?: string;
-    email?: string;
-    ph_no?: string;
-}
-
-export class ApiError extends Error {
-    constructor(message: string, public status?: number, public details?: unknown) {
-        super(message);
-        this.name = 'ApiError';
-    }
-}
+import { Company, CompanyInputData, ApiError } from "./types"; // Adjust the import path as necessary
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const COMPANY_ENDPOINT = `${API_BASE_URL}/company`; 
@@ -173,3 +147,4 @@ export const deleteCompany = async (id: string) => {
         throw new Error(`Failed to delete company: ${err instanceof Error ? err.message : String(err)}`);
     }
 };
+

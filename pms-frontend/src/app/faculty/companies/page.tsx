@@ -5,7 +5,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, Button, Input } from '@her
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, ModuleRegistry, AllCommunityModule } from 'ag-grid-community'; // Import ColDef type
 import { useCompanyManagement } from './components/useCompanyManagement'; // Adjust path
-import { Company } from './components/API'; // Adjust path
+import { Company } from './components/types'; // Adjust path
 
 
 interface Params{
@@ -164,7 +164,7 @@ function CompaniesPage() {
                         <Input label="Website" value={formData.site} onValueChange={v => handleFormChange('site', v)} className="mb-3" placeholder="https://example.com"/>
                         <Input label="Branch *" value={formData.branch} onValueChange={v => handleFormChange('branch', v)} className="mb-3" isRequired />
                         <Input label="Description" value={formData.desc} onValueChange={v => handleFormChange('desc', v)} className="mb-3" />
-                        <Input label="Contact Email" type="email" value={formData.email} onValueChange={v => handleFormChange('email', v)} className="mb-3" />
+                        <Input label="Contact Email" type="email" value={formData.email || ""} onValueChange={v => handleFormChange('email', v)} className="mb-3" />
                         <Input label="Contact Phone" value={formData.ph_no} onValueChange={v => handleFormChange('ph_no', v)} className="mb-3" />
 
                          {error && <p className="mb-2 text-sm text-red-500">{error}</p>}
@@ -186,7 +186,7 @@ function CompaniesPage() {
                         <Input label="Website" value={editFormData.site} onValueChange={v => handleEditFormChange('site', v)} className="mb-3" placeholder="https://example.com"/>
                         <Input label="Branch *" value={editFormData.branch} onValueChange={v => handleEditFormChange('branch', v)} className="mb-3" isRequired />
                         <Input label="Description" value={editFormData.desc} onValueChange={v => handleEditFormChange('desc', v)} className="mb-3" />
-                        <Input label="Contact Email" type="email" value={editFormData.email} onValueChange={v => handleEditFormChange('email', v)} className="mb-3" />
+                        <Input label="Contact Email" type="email" value={editFormData.email || ""} onValueChange={v => handleEditFormChange('email', v)} className="mb-3" />
                         <Input label="Contact Phone" value={editFormData.ph_no} onValueChange={v => handleEditFormChange('ph_no', v)} className="mb-3" />
 
                          {error && <p className="mb-2 text-sm text-red-500">{error}</p>}

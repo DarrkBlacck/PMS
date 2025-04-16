@@ -31,6 +31,8 @@ from pms.services.resume_services import resume_mgr
 from pms.routes.alumni import router as alumniRouter
 from pms.services.alumni_services import alumni_mgr
 
+
+
 origins = [
     "http://localhost:3000",  # Adjust this if your frontend runs on a different port
     "http://fictional-yodel-x77wwxg7pjhv4rw-3000.app.github.dev",  # Add frontend URL
@@ -61,6 +63,7 @@ async def lifespan(app: FastAPI):
     await db.close()
 
 app = FastAPI(lifespan=lifespan)
+
 
 @app.options("/{path:path}")
 async def options_handler(path: str):

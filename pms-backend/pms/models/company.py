@@ -13,7 +13,7 @@ class Company(BaseModel):
     email: Optional[EmailStr] = None
     ph_no: Optional[Annotated[str, constr(min_length=10, max_length=10)]]=None
     avg_salary: Optional[float] = None
-    placed_students: Optional[List[str]] = None
+    placed_students: Optional[List[str]] = []
     
 class CompanyUpdate(BaseModel):
     name: Optional[str] = None
