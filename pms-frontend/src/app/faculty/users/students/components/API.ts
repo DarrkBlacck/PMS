@@ -43,7 +43,7 @@ export const addStudentAPI = async (studentData: StudentFormData): Promise<Stude
  */
 export const updateStudentAPI = async (studentId: string, studentData: StudentFormData): Promise<Student> => {
   const response = await fetch(`${API_BASE_URL}/student/update/${studentId}`, {
-    method: "PUT",
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },

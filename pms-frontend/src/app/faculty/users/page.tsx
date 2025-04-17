@@ -11,9 +11,6 @@ import { User } from './components/types';
 // Register AG Grid modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-// Import AG Grid styles
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 function UsersPage() {
   const {
@@ -67,14 +64,20 @@ function UsersPage() {
             <Button 
               isIconOnly
               onPress={() => handleEdit(params.data)} 
-              className="bg-blue-600 text-white"
+              radius='full'
+              color='success'
+              size='sm'
+              variant='ghost'
             >
               <MdEdit />
             </Button>
             <Button 
               isIconOnly
               onPress={() => openDeleteModal(params.data)} 
+              radius='full'
               color="danger"
+              size='sm'
+              variant='ghost'
             >
               <MdDeleteForever />
             </Button>

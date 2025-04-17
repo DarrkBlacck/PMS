@@ -125,13 +125,13 @@ const Profile = () => {
               <Select
                 id="gender"
                 name="gender"
-                value={profile.gender}
+                selectedKeys={[profile.gender]}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => 
                   handleSelectChange('gender', e.target.value)
                 }
                 disabled={!isEditing}
               >
-                <SelectItem key="Male">Male</SelectItem>
+                <SelectItem textValue='' key="Male">Male</SelectItem>
                 <SelectItem key="Female">Female</SelectItem>
                 <SelectItem key="Other">Other</SelectItem>
               </Select>
@@ -142,7 +142,7 @@ const Profile = () => {
               <Select
                 id="program"
                 name="program"
-                value={profile.program}
+                selectedKeys={[profile.program]}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => 
                   handleSelectChange('program', e.target.value)
                 }

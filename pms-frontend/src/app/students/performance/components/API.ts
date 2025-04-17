@@ -4,7 +4,7 @@ import { Performance } from "./types";
  * Fetch student performance data
  */
 export const fetchStudentPerformanceAPI = async (studentId: string): Promise<Performance> => {
-    const response = await fetch(`${process.env.NEXT_API_BASE_URL}/performance/student/${studentId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/student-performance/student/${studentId}`, {
       method: "GET",
     });
     
@@ -44,7 +44,7 @@ export const fetchStudentPerformanceAPI = async (studentId: string): Promise<Per
     }
     
     return new Promise((resolve, reject) => {
-      xhr.open('POST', `${process.env.NEXT_API_BASE_URL}/files/upload`);
+      xhr.open('POST', `${process.env.NEXT_PUBLIC_API_BASE_URL}/files/upload`);
       
       xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) {

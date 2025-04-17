@@ -1,7 +1,7 @@
 import { Student, Company, Job, Requirement, Drive, Resume } from "./types";
 import { PrefillData } from '../components/types';
 
-export const fetchStudentByIdAPI = async (userId: any) => {
+export const fetchStudentByIdAPI = async (userId: string) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/student/get-user/${userId}`, {
         method: "GET",
     });
