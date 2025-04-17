@@ -1,10 +1,10 @@
 // JobDetailsTab.tsx
 import { Tabs, Tab, Accordion, AccordionItem, Input, Button, Card, CardBody, Progress, Textarea } from "@heroui/react";
 import { useState, useEffect } from "react";
-import { Job } from "./useDriveManagement";
+import { Job, Company } from "./types";
 
 interface JobDetailsTabProps {
-    drive_companies: any[];
+    drive_companies: Company[];
     onAddJob: () => void;
     jobs: Job[];
     job_id: string;
@@ -51,35 +51,23 @@ export default function JobDetailsTab({
     drive_companies,
     onAddJob,
     jobs,
-    job_id,
     setJobId,
     onUpdateJob,
     onDeleteJob,
-    company_id,
     setCompanyId,
-    jobTitle,
     setJobTitle,
-    jobExperience,
     setJobExperience,
     jobProgressList,
-    desc,
     setJobDesc,
-    jobLocation,
     setJobLocation,
-    jobSalary,
     setJobSalary,
-    joinDate,
     setJoinDate,
-    lastDate,
     setLastDate,
-    contactPerson,
     setContactPerson,
-    contactEmail,
     setContactEmail,
-    additional_instructions,
     setAdditionalInstructions,
     onAddRequirement,
-    form_link, setFormLink,
+    setFormLink,
 }: JobDetailsTabProps) {
     const [selectedCompany, setSelectedCompany] = useState("");
 
@@ -88,7 +76,7 @@ export default function JobDetailsTab({
             setSelectedCompany(drive_companies[0]._id);
             setCompanyId(drive_companies[0]._id);
         }
-    }, [drive_companies]);
+    }, [drive_companies, selectedCompany, setCompanyId]);
 
     return (
         <Card className="w-full max-w-5xl p-6 shadow-lg">
@@ -176,7 +164,7 @@ export default function JobDetailsTab({
                                                                         label="Job Description"
                                                                         variant="bordered"
                                                                         defaultValue={job.desc}
-                                                                        onChange={(e: any) => setJobDesc(e.target.value)}
+                                                                        onChange={(e) => setJobDesc(e.target.value)}
                                                                         className="w-full"
                                                                         minRows={6}
                                                                         classNames={{
@@ -196,7 +184,7 @@ export default function JobDetailsTab({
                                                                             label="Experience (years)"
                                                                             variant="bordered"
                                                                             defaultValue={String(job.experience)}
-                                                                            onChange={(e) => setJobExperience(Number(e.target.value))}
+                                                                            onChange={(e) => setJobExperience(Number(e.target.value) || 0)}
                                                                         />
                                                                         <Input
                                                                             label="Salary"

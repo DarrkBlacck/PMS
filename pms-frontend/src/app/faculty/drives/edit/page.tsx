@@ -9,7 +9,6 @@ import AddCompanyModal from "../components/AddCompanyModal";
 import AddJobModal from "../components/AddJobModal";
 import RequirementsModal from "../components/RequirementsModal";
 import { useDriveManagement } from "../components/useDriveManagement";
-import { set } from "date-fns";
 
 export default function Edit() {
     const [addCompanyModal, setAddCompanyModal] = useState(false);
@@ -21,12 +20,12 @@ export default function Edit() {
 
     const driveManagement = useDriveManagement();
     const {
-        drive, setDrive,
+        drive,
         title, setTitle,
         location, setLocation,
         drive_companies,
         all_companies,
-        jobs, setJobs,
+        jobs,
         drive_id, setDriveId,
         driveform_link, setDriveFormLink,
         disabled,
@@ -80,7 +79,6 @@ export default function Edit() {
         requiredCertifications, setRequiredCertifications,
         languageRequirements, setLanguageRequirements,
         startAddingRequirement,
-        startUpdatingRequirement,
     } = driveManagement;
 
     useEffect(() => {
@@ -93,7 +91,8 @@ export default function Edit() {
                 console.error("Error loading drive:", error);
                 setIsLoading(false);
             });
-    }, [id]);
+             // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id, setDriveId]);
 
     if (isLoading) {
         return <div>Loading drive details...</div>;

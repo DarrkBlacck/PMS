@@ -1,5 +1,6 @@
 // AddJobModal.tsx
 import { Modal, ModalContent, ModalHeader, ModalBody, Button, Input } from "@heroui/react";
+import { Company } from "./types";
 
 
 interface AddJobModalProps {
@@ -10,7 +11,7 @@ interface AddJobModalProps {
     jobExperience: number;
     setJobExperience: (value: number) => void;
     onAddJob: () => void;
-    drive_companies: any[];
+    drive_companies: Company[];
     desc: string;
     setJobDesc: (value: string) => void;
     jobLocation: string;

@@ -1,5 +1,5 @@
 //API.ts
-import { Drive, Company, Job, Requirement } from "./useDriveManagement";
+import { Drive, Company, Job, Requirement } from "./types";
 
 export const fetchCompaniesAPI = async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/company/get`, {
@@ -11,7 +11,7 @@ export const fetchCompaniesAPI = async () => {
     return await response.json();
 };
 
-export const fetchCompaniesByDriveAPI = async (driveId: any) => {
+export const fetchCompaniesByDriveAPI = async (driveId: string) => {
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/drive_company/get/drive/${driveId}`, {
         method: "GET",

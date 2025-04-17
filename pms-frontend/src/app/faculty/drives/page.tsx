@@ -51,17 +51,20 @@ useEffect(() => {
           </Button>
        </div>
                        <h1 className="text-3xl text-center font-semibold mt-2 mb-6">Available Drives</h1>
-            {drives.map((drive, index) => (
-            <div className="w-full gap-2 mt-4">
-              <Card key={index} isPressable 
-                    className="w-5/6 mb-3 ml-4 p-4 border h-[90px] hover:h-[130px] shadow-sm hover:shadow-lg hover:bg-primary hover:text-white"
-                    onPress={() => router.push(`/faculty/drives/edit?id=${(drive as Drive)._id}`)}
-                    >
-                  <p className="font-medium">{(drive as Drive).title}</p>
-                  <p className="text-sm ">Id: {(drive as Drive)._id}</p>
-              </Card>
-            </div>
-            ))}
+                       {drives.map((drive, index) => (
+  <div className="w-full gap-2 mt-4" key={index}>
+    <Card 
+      isPressable 
+      className="w-5/6 mb-3 ml-4 p-4 border h-[90px] hover:h-[130px] shadow-sm hover:shadow-lg hover:bg-primary hover:text-white"
+      onPress={() => router.push(`/faculty/drives/edit?id=${(drive as Drive)._id}`)}
+    >
+      <div className="flex flex-col text-left">
+        <p className="font-medium">{(drive as Drive).title}</p>
+        <p className="text-sm mt-1">{(drive as Drive).location}</p>
+      </div>
+    </Card>
+  </div>
+))}
             
       </div>
   );

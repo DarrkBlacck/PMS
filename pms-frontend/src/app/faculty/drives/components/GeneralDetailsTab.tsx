@@ -209,7 +209,7 @@ export default function GeneralDetailsTab({
                                 </div>
                             ))}
                              {stages.length === 0 && ( // Optional: Message if no stages exist (shouldn't happen with hook init)
-                                <p className="text-sm text-gray-500 text-center">Click 'Add Stage' to define the recruitment process.</p>
+                                <p className="text-sm text-gray-500 text-center">Click Add Stage to define the recruitment process.</p>
                              )}
                         </div>
                     </div>

@@ -11,7 +11,7 @@ class User(BaseModel):
     last_name: Optional[str]=""
     gender: Optional[Literal["Male", "Female", "Other"]]="Male"
     email: Optional[EmailStr]=""
-    ph_no: Annotated[str, constr(min_length=10, max_length=10)]
+    ph_no: Annotated[str, constr(min_length=10, max_length=14)]
     password: Optional[str]=""
     role: Literal["admin", "faculty", "student", "alumni"]
     status: Optional[Literal["Inactive", "Active"]] = "Inactive"
@@ -23,7 +23,7 @@ class UserUpdate(BaseModel):
     last_name: Optional[str]=None
     gender: Optional[Literal["Male", "Female", "Other"]]=None
     email: Optional[EmailStr]=None
-    ph_no: Optional[Annotated[str, constr(min_length=10, max_length=10)]]=None
+    ph_no: Optional[Annotated[str, constr(min_length=10, max_length=14)]]=None
     password: Optional[str]=None
     role: Optional[Literal["admin", "faculty", "student", "alumni"]]=None
     status: Optional[Literal["Inactive", "Active"]] =None   

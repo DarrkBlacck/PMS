@@ -16,10 +16,10 @@ const DEFAULT_PROFILE: FacultyProfile = {
   state: '',
   district: '',
   gender: '',
-  email: '',
-  alt_email: '',
-  ph_no: '',
-  alt_ph: '',
+  email: null,
+  alt_email: null,
+  ph_no: null,
+  alt_ph: null,
   program: ''
 };
 

@@ -20,8 +20,8 @@ class Student(BaseModel):
     gender: Optional[Literal["Male","Female","Other"]] = None
     email: EmailStr
     alt_email: Optional[EmailStr] = None
-    ph_no: Optional[str] = Field(None, min_length=10, max_length=10)
-    alt_ph: Optional[str] = Field(None, min_length=10, max_length=10)
+    ph_no: Optional[str] = Field(None, min_length=10, max_length=14)
+    alt_ph: Optional[str] = Field(None, min_length=10, max_length=14)
     created_at:Optional[datetime]=None
     updated_at:Optional[datetime]=None
     join_date:Optional[datetime]=None
@@ -45,8 +45,8 @@ class StudentUpdate(BaseModel):
     gender: Optional[Literal["Male","Female","Other"]] = None
     email: Optional[EmailStr] = None
     alt_email: Optional[EmailStr] = None
-    ph_no: Optional[str] = Field(None, min_length=10, max_length=10) 
-    alt_ph: Optional[str] = Field(None, min_length=10, max_length=10)
+    ph_no: Optional[str] = Field(None, min_length=10, max_length=14) 
+    alt_ph: Optional[str] = Field(None, min_length=10, max_length=14)
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     join_date: Optional[datetime] = None

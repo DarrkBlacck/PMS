@@ -112,8 +112,6 @@ import {
     setPlustwoCgpa,
     degreeCgpa,
     setDegreeCgpa,
-    mcaCgpa, // Unused prop
-    setMcaCgpa, // Unused prop
     contract,
     setContract,
     additionalCriteria,

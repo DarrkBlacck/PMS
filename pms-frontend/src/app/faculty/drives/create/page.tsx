@@ -1,6 +1,6 @@
 'use client';
 import { useState } from "react";
-import { Tabs, Tab, form } from "@heroui/react";
+import { Tabs, Tab } from "@heroui/react";
 import GeneralDetailsTab from "../components/GeneralDetailsTab";
 import CompanyDetailsTab from "../components/CompanyDetailsTab";
 import JobDetailsTab from "../components/JobDetailsTab";
@@ -16,7 +16,7 @@ export default function Create() {
 
     const driveManagement = useDriveManagement();
     const {
-        drive, setDrive,
+        drive,
         title, setTitle,
         desc, setDesc,
         location, setLocation,
@@ -25,7 +25,7 @@ export default function Create() {
         additional_instructions, setAdditionalInstructions,
         drive_companies,
         all_companies,
-        jobs, setJobs,
+        jobs,
         disabled,
         selected, setSelected: setSelectedState,
         startAddingDrive,

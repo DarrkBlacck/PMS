@@ -12,7 +12,7 @@ class Alumni(BaseModel):
     last_name: Optional[str] = ""
     dob: Optional[datetime] = None
     email: EmailStr
-    ph_no: Optional[str] = Field(None, min_length=10, max_length=10)
+    ph_no: Optional[str] = Field(None, min_length=10, max_length=14)
     address: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = "Kerala"
@@ -28,7 +28,7 @@ class AlumniUpdate(BaseModel):
     last_name: Optional[str] = None
     dob: Optional[datetime] = None
     email: Optional[EmailStr] = None
-    ph_no: Optional[str] = Field(None, min_length=10, max_length=10)
+    ph_no: Optional[str] = Field(None, min_length=10, max_length=14)
     address: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None

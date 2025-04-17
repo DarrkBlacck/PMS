@@ -14,7 +14,7 @@ class Job(BaseModel):
     loc: Optional[str] = None
     job_type: Optional[Literal["full-time", "part-time", "contract", "remote"]] = None
     requirement: Optional[str] = None
-    experience: int
+    experience: Optional[int] = 0
     salary: Optional[float] = None
     salary_range: Optional[List[float]] = None  # [min_salary, max_salary]
     join_date: Optional[datetime] = None

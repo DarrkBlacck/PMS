@@ -10,8 +10,8 @@ export interface FacultyProfile {
   district: string;
   gender: string;
   email: string;
-  alt_email: string;
-  ph_no: string;
-  alt_ph: string;
+  alt_email?: string;
+  ph_no?: string;
+  alt_ph?: string;
   program: string;
 }

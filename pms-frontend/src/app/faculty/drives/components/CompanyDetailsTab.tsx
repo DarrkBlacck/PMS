@@ -1,9 +1,9 @@
 // CompanyDetailsTab.tsx
-import { Accordion, AccordionItem, Input, Button, Card, CardBody, Progress } from "@heroui/react";
-import { useState } from "react";
+import { Accordion, AccordionItem, Input, Button, Card, CardBody, Progress, Textarea } from "@heroui/react";
+import { Company } from "./types";
 
 interface CompanyDetailsTabProps {
-    drive_companies: any[];
+    drive_companies: Company[];
     onAddCompany: () => void;
     companyName: string;
     setCompanyName: (value: string) => void;
@@ -27,22 +27,16 @@ interface CompanyDetailsTabProps {
 export default function CompanyDetailsTab({ 
     drive_companies,
     onAddCompany,
-    companyName,
     setCompanyName,
-    branch,
     setBranch,
     onUpdateCompany,
-    company_id,
     setCompanyId,
     onDeleteCompany,
     companyProgressList,
-    site,
     setSite,
-    email,
     setEmail,
-    ph_no,
     setPhNo,
-    desc, setCompanyDesc,
+    setCompanyDesc,
 }: CompanyDetailsTabProps) 
 {
     return (
@@ -106,14 +100,14 @@ export default function CompanyDetailsTab({
 
                                     {/* Description */}
                                     <div className="w-full">
-                                        <Input
+                                        <Textarea
                                             label="Description"
                                             variant="bordered"
                                             defaultValue={company.desc}
-                                            classNames={{
-                                                label: "font-medium",
-                                                input: "min-h-[80px]"
-                                            }}
+                                            // classNames={{
+                                            //     label: "font-medium",
+                                            //     input: "min-h-[80px]"
+                                            // }}
                                             onChange={(e) => setCompanyDesc(e.target.value)}
                                         />
                                     </div>

@@ -1,5 +1,7 @@
 // AddCompanyModal.tsx
 import { Modal, ModalContent, ModalHeader, ModalBody, Button, Autocomplete, AutocompleteItem, Input } from "@heroui/react";
+import { Company } from "./types";
+
 
 interface AddCompanyModalProps {
     isOpen: boolean;
@@ -9,7 +11,7 @@ interface AddCompanyModalProps {
     branch: string;
     setBranch: (value: string) => void;
     onAddCompany: () => void;
-    all_companies: any[];
+    all_companies: Company[];
     site: string;
     setSite: (value: string) => void;
     email: string;

@@ -1,74 +1,183 @@
-// students/components/API.ts
-import { Student, StudentFormData } from './types';
+// src/services/studentAPI.ts
+
+import { Student, StudentInputData, ApiError } from "./types"; // Adjust the import path as necessary
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const STUDENT_ENDPOINT = `${API_BASE_URL}/student`; 
 
 /**
- * Fetch all students
+ * Fetches all students from the API.
  */
-export const fetchStudentsAPI = async (): Promise<Student[]> => {
-  const response = await fetch(`${API_BASE_URL}/student/get`, {
-    method: "GET",
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Server returned with an error: ${response.status}`);
-  }
-  
-  return await response.json();
+export const getStudents = async (): Promise<Student[]> => {
+    try {
+        const response = await fetch(`${STUDENT_ENDPOINT}/get`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch {
+                throw new ApiError(`Server responded with status: ${response.status}`, response.status);
+            }
+            const message = errorData?.message || errorData?.detail || `Failed to fetch students (${response.status})`;
+            throw new ApiError(message, response.status, errorData);
+        }
+
+        return await response.json() as Student[];
+
+    } catch (err) {
+        console.error("API Error [getStudents]:", err);
+        if (err instanceof ApiError) {
+            throw err;
+        }
+        throw new Error(`Failed to fetch students: ${err instanceof Error ? err.message : String(err)}`);
+    }
 };
 
 /**
- * Add a new student
+ * Fetches a single student by ID.
  */
-export const addStudentAPI = async (studentData: StudentFormData): Promise<Student> => {
-  const response = await fetch(`${API_BASE_URL}/student/add`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(studentData),
-  });
-  
-  if (!response.ok) {
-    const errorResponse = await response.json();
-    throw new Error(errorResponse.detail || `Failed to add student: ${response.status}`);
-  }
-  
-  return await response.json();
+export const getStudent = async (id: string): Promise<Student> => {
+    try {
+        const response = await fetch(`${STUDENT_ENDPOINT}/get/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch {
+                throw new ApiError(`Server responded with status: ${response.status}`, response.status);
+            }
+            const message = errorData?.message || errorData?.detail || `Failed to fetch student (${response.status})`;
+            throw new ApiError(message, response.status, errorData);
+        }
+
+        return await response.json() as Student;
+
+    } catch (err) {
+        console.error("API Error [getStudent]:", err);
+        if (err instanceof ApiError) {
+            throw err;
+        }
+        throw new Error(`Failed to fetch student: ${err instanceof Error ? err.message : String(err)}`);
+    }
 };
 
 /**
- * Update an existing student
+ * Adds a new student via the API.
  */
-export const updateStudentAPI = async (studentId: string, studentData: StudentFormData): Promise<Student> => {
-  const response = await fetch(`${API_BASE_URL}/student/update/${studentId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(studentData),
-  });
-  
-  if (!response.ok) {
-    const errorResponse = await response.json();
-    throw new Error(errorResponse.detail || `Failed to update student: ${response.status}`);
-  }
-  
-  return await response.json();
+export const addStudent = async (studentData: StudentInputData) => {
+    try {
+        const response = await fetch(`${STUDENT_ENDPOINT}/add`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(studentData),
+        });
+
+        if (!response.ok) {
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch {
+                throw new ApiError(`Server responded with status: ${response.status}`, response.status);
+            }
+            const message = errorData?.message || errorData?.detail || `Failed to add student (${response.status})`;
+            throw new ApiError(message, response.status, errorData);
+        }
+
+        return await response.json();
+
+    } catch (err) {
+        console.error("API Error [addStudent]:", err);
+        if (err instanceof ApiError) {
+            throw err;
+        }
+        throw new Error(`Failed to add student: ${err instanceof Error ? err.message : String(err)}`);
+    }
 };
 
 /**
- * Delete a student
+ * Updates an existing student via the API.
  */
-export const deleteStudentAPI = async (studentId: string): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/student/delete/${studentId}`, {
-    method: "DELETE",
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Failed to delete student: ${response.status}`);
-  }
-  
-  return await response.json();
+export const updateStudent = async (id: string, studentData: Partial<StudentInputData>) => {
+    try {
+        const response = await fetch(`${STUDENT_ENDPOINT}/update/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(studentData),
+        });
+
+        if (!response.ok) {
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch {
+                throw new ApiError(`Server responded with status: ${response.status}`, response.status);
+            }
+            const message = errorData?.message || errorData?.detail || `Failed to update student (${response.status})`;
+            throw new ApiError(message, response.status, errorData);
+        }
+
+        return await response.json();
+
+    } catch (err) {
+        console.error("API Error [updateStudent]:", err);
+        if (err instanceof ApiError) {
+            throw err;
+        }
+        throw new Error(`Failed to update student: ${err instanceof Error ? err.message : String(err)}`);
+    }
+};
+
+/**
+ * Deletes a student via the API.
+ */
+export const deleteStudent = async (id: string) => {
+    try {
+        const response = await fetch(`${STUDENT_ENDPOINT}/delete/${id}`, {
+            method: "DELETE"
+        });
+
+        if (!response.ok) {
+            let errorData;
+            try {
+                if (response.status !== 204) {
+                    errorData = await response.json();
+                } else {
+                    throw new ApiError(`Server responded with status: ${response.status}`, response.status);
+                }
+            } catch {
+                throw new ApiError(`Server responded with status: ${response.status}`, response.status);
+            }
+            const message = errorData?.message || errorData?.detail || `Failed to delete student (${response.status})`;
+            throw new ApiError(message, response.status, errorData);
+        }
+
+        if (response.status === 204) {
+            return { success: true };
+        }
+        
+        return await response.json();
+
+    } catch (err) {
+        console.error("API Error [deleteStudent]:", err);
+        if (err instanceof ApiError) {
+            throw err;
+        }
+        throw new Error(`Failed to delete student: ${err instanceof Error ? err.message : String(err)}`);
+    }
 };

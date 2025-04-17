@@ -19,8 +19,8 @@ export interface AlumniFormData {
   first_name: string;
   middle_name: string;
   last_name: string;
-  email: string;
-  ph_no: string;
+  email?: string | null;
+  ph_no?: string | null;
   adm_no: string;
   status: AlumniStatus | string;
 }

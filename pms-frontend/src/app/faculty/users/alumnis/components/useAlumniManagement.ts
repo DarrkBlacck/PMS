@@ -17,8 +17,8 @@ const DEFAULT_FORM_DATA: AlumniFormData = {
   first_name: "",
   middle_name: "",
   last_name: "",
-  email: "",
-  ph_no: "",
+  email: null,
+  ph_no: null,
   adm_no: "",
   status: "Unemployed"
 };

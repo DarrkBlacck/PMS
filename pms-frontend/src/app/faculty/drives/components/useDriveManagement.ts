@@ -11,89 +11,7 @@ import {
   updateDriveAPI, addRequirementAPI, fetchRequirementsByJobAPI, updateRequirementAPI 
 } from "./API";
 
-// Type definitions
-export interface Drive {
-    _id: string;
-    title: string;
-    desc?: string;
-    location?: string;
-    drive_date?: string | Date;
-    applied_students?: string[];
-    stages?: string[];
-    selected_students?: string[];
-    send_to?: string[];
-    created_at?: string;
-    application_deadline?: string | Date;
-    additional_instructions?: string;
-    form_link?: string;
-}
-
-export interface Company {
-    _id: string;
-    name: string;
-    site?: string;
-    branch: string;
-    desc?: string;
-    email?: string;
-    ph_no?: string;
-    avg_salary?: number;
-    placed_students?: string[];
-}
-
-export interface Job {
-    _id: string;
-    company: string;
-    drive: string;
-    title: string;
-    desc?: string;
-    loc?: string;
-    requirement?: string;
-    experience: number;
-    salary?: number;
-    join_date: string | Date;
-    last_date: string | Date;
-    contact_person?: string;
-    contact_email?: string;
-    additional_instructions?: string;
-    form_link?: string;
-}
-
-export interface Requirement {
-    _id?: string;
-    job: string;
-    experience_required: number;
-    sslc_cgpa?: number;
-    plustwo_cgpa?: number;
-    degree_cgpa?: number;
-    mca_cgpa?: number[];
-    contract?: number;
-    additional_criteria?: string;
-    skills_required?: string[];
-    preferred_qualifications?: string[];
-    required_certifications?: string[];
-    language_requirements?: string[];
-    requirement_desc?: string;
-}
-
-interface ProgressTracker {
-    id: string;
-    progress: number;
-}
-
-interface ActionStates {
-    addingDrive: boolean;
-    updatingDrive: boolean;
-    deletingDrive: boolean;
-    addingCompany: boolean;
-    updatingCompany: boolean;
-    deletingCompany: boolean;
-    addingJob: boolean;
-    updatingJob: boolean;
-    deletingJob: boolean;
-    addingRequirement: boolean;
-    updatingRequirement: boolean;
-    deletingRequirement: boolean;
-}
+import { Drive, Company, Job, Requirement, ProgressTracker, ActionStates } from "./types";
 
 export const useDriveManagement = () => {
     const router = useRouter();
@@ -380,6 +298,7 @@ export const useDriveManagement = () => {
             setDriveDate(data.drive_date ? new Date(data.drive_date) : null);
             setApplicationDeadline(data.application_deadline ? new Date(data.application_deadline) : null);
             setAdditionalInstructions(data.additional_instructions);
+            setDriveFormLink(data.form_link);
             setStages(data.data.stages || []);
             setSelected("Companies");
             
@@ -413,6 +332,7 @@ export const useDriveManagement = () => {
             setLocation(data.data.location);
             setDriveDate(data.data.drive_date ? new Date(data.data.drive_date) : null);
             setApplicationDeadline(data.data.application_deadline ? new Date(data.data.application_deadline) : null);
+            setDriveFormLink(data.data.form_link);
             setAdditionalInstructions(data.data.additional_instructions);
             setStages(data.data.stages || []);
 
@@ -542,13 +462,14 @@ export const useDriveManagement = () => {
             const companyData: Partial<Company> = {
                 name: companyName?.trim?.() || currentCompany.name,
                 branch: branch?.trim?.() || currentCompany.branch,
-                desc: desc?.trim?.() || currentCompany.desc,
+                desc: companyDesc || currentCompany.desc,
                 site: site?.trim?.() || currentCompany.site,
                 email: email?.trim?.() || currentCompany.email,
                 ph_no: ph_no?.trim?.() || currentCompany.ph_no,
             };
 
             const data = await updateCompanyAPI(companyId, companyData);
+            await fetchCompanies();
             await fetchCompaniesByDrive(drive_id);
             setCompanyName(data.data.name);
             setBranch(data.data.branch);
@@ -556,6 +477,7 @@ export const useDriveManagement = () => {
             setEmail(data.data.email);
             setPhNo(data.data.ph_no);
             setCompanyDesc(data.data.desc);
+            console.log(drive_companies);
             setDisabled([]);
             
             return data;
@@ -565,8 +487,8 @@ export const useDriveManagement = () => {
             throw err;
         }
     }, [
-        drive_companies, companyName, branch, desc, site, email, 
-        ph_no, drive_id, fetchCompaniesByDrive
+        drive_companies, companyName, branch, companyDesc, site, email, 
+        ph_no, drive_id, fetchCompaniesByDrive, fetchCompanies
     ]);
 
     
@@ -587,7 +509,7 @@ export const useDriveManagement = () => {
                 company: companyId,
                 drive: driveId,
                 title: jobTitle,
-                experience: jobExperience,
+                experience: jobExperience || 0,
                 desc: jobDesc,
                 loc: jobLocation,
                 requirement: jobRequirement,
@@ -630,8 +552,7 @@ export const useDriveManagement = () => {
 
             const jobData: Partial<Job> = {
                 title: jobTitle?.trim?.() === "" ? currentJob.title : jobTitle,
-                experience: !jobExperience ? currentJob.experience : jobExperience,
-                desc: jobDesc?.trim?.() === "" ? currentJob.desc : jobDesc,
+                experience: jobExperience ?? currentJob.experience,                desc: jobDesc?.trim?.() === "" ? currentJob.desc : jobDesc,
                 loc: jobLocation?.trim?.() === "" ? currentJob.loc : jobLocation,
                 salary: jobSalary ? jobSalary : currentJob.salary,
                 join_date: !joinDate ? currentJob.join_date : joinDate,
@@ -828,6 +749,7 @@ export const useDriveManagement = () => {
             setDriveDate(driveData.drive_date ? new Date(driveData.drive_date) : null);
             setApplicationDeadline(driveData.application_deadline ? new Date(driveData.application_deadline) : null);
             setAdditionalInstructions(driveData.additional_instructions);
+            setDriveFormLink(driveData.form_link);
             setStages(driveData.stages || []);
             
             // Calculate drive progress after fetching
@@ -928,12 +850,13 @@ export const useDriveManagement = () => {
             drive_date: drive_date || undefined,
             stages,
             application_deadline: application_deadline || undefined,
-            additional_instructions
+            additional_instructions,
+            form_link: driveform_link || undefined
         };
         setDriveProgress(calculateDriveProgress(driveData));
     }, [
         title, desc, location, drive_date, stages, 
-        application_deadline, additional_instructions, calculateDriveProgress
+        application_deadline, additional_instructions, driveform_link,calculateDriveProgress
     ]);
 
     useEffect(() => {
