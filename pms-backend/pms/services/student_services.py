@@ -1,3 +1,4 @@
+from typing import List
 from pms.db.database import DatabaseConnection
 from pms.models.student import Student, StudentUpdate
 from datetime import datetime
@@ -150,5 +151,35 @@ class StudentMgr:
             return None
         except Exception as e:
             raise Exception(f"Error updating student: {str(e)}")
+    
+    async def get_students_by_ids(self, student_ids: List[str]):
+        """
+        Fetches multiple student documents based on a list of student IDs.
+        """
+        try:
+            object_ids = []
+            invalid_ids = []
+            for s_id in student_ids:
+                if ObjectId.is_valid(s_id):
+                    object_ids.append(ObjectId(s_id))
+                else:
+                    invalid_ids.append(s_id)
+
+            if invalid_ids:
+                raise ValueError(f"Invalid ObjectId format for IDs: {', '.join(invalid_ids)}")
+
+            if not object_ids:
+                return [] 
+
+            students_list = await self.students_collection.find({"_id": {"$in": object_ids}}).to_list(length=None)
+            for student in students_list:
+                student["_id"] = str(student["_id"])
+            return students_list
+        
+        except ValueError as ve: 
+            raise Exception(str(ve))
+        except Exception as e:
+            print(f"Database error fetching students by ID: {e}")
+            raise Exception(f"Error fetching students by IDs: {str(e)}")
 
 student_mgr = StudentMgr()

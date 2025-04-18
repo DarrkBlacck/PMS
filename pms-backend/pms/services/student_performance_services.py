@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from pms.models.student_performance import StudentPerformance, StudentPerformanceUpdate
 from pymongo import ReturnDocument
-from typing import List
+from typing import Any, Dict, List
 from bson import ObjectId
 from pms.db.database import DatabaseConnection
 from pms.core.config import config
@@ -15,6 +15,20 @@ class StudentPerformanceMgr:
     async def initialize(self):
         self.db = DatabaseConnection()
         self.student_performance_collection  = await self.db.get_collection("student_performance")
+    
+    async def get_all_student_performances(self) -> List[Dict[str, Any]]:
+        try:     
+            performances = await self.student_performance_collection.find().to_list(length=None)
+            for perf in performances:
+                if "_id" in perf:
+                    perf["_id"] = str(perf["_id"])
+            return performances
+        except Exception as e:
+
+            print(f"Error fetching all student performances: {str(e)}")
+            raise Exception(f"Error fetching all student performances: {str(e)}")
+
+
     async def get_student_performances(self, student_id: str):
         try:
             await self.db.connect()

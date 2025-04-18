@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, status, APIRouter, Request
+from fastapi import Body, FastAPI, HTTPException, status, APIRouter, Request
 from pms.models.student import Student, StudentUpdate
 from pms.services.student_services import student_mgr
 from pms.utils.form_prefill import prefill_mgr
@@ -105,3 +105,28 @@ async def prefill_form(request: Request):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/get/students-by-ids", response_model=List[Student])
+async def get_students_by_ids_route(student_ids: List[str] = Body(..., embed=False)):
+
+    try:
+        if not student_ids:
+             raise HTTPException(
+                 status_code=status.HTTP_400_BAD_REQUEST,
+                 detail="Student ID list cannot be empty."
+             )
+
+        students = await student_mgr.get_students_by_ids(student_ids)
+        return students
+    except HTTPException as http_exc: 
+        raise http_exc
+    except Exception as e:
+        if "Invalid ObjectId format" in str(e):
+             raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e) 
+            )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching students by IDs: {str(e)}"
+        )

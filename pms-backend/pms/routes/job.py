@@ -60,6 +60,8 @@ async def get_job_by_drivecompany(drive_id: str, company_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error fetching data: {str(e)}"
         )
+
+
     
 @router.post("/add/{drive_id}/{company_id}")
 async def add_job(job: Job, drive_id: str, company_id: str):
@@ -125,4 +127,27 @@ async def delete_job_by_drivecompany(drive_id: str, company_id: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error deleting job: {str(e)}"
+        )
+
+@router.get("/jobs/{job_id}/eligible-students", response_model=List[str])
+async def get_eligible_students_for_job(job_id: str):
+    """
+    Retrieves a list of student IDs eligible for a specific job 
+    based on defined requirements (passout year, CGPA).
+    """
+    try:
+         
+        eligible_student_ids = await job_mgr.get_eligible_students(job_id)
+        return eligible_student_ids
+
+    except HTTPException as http_exc:
+
+        raise http_exc
+
+    except Exception as e:
+
+        print(f"Error getting eligible students for job {job_id}: {e}") 
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred while fetching eligible students: {str(e)}"
         )

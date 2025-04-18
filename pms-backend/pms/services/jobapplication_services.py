@@ -3,6 +3,7 @@ from typing import List
 from bson import ObjectId
 from pymongo import ReturnDocument
 from pms.models.jobapplication import JobApplication
+from pms.services.job_services import job_mgr
 from pms.db.database import DatabaseConnection
 
 
@@ -74,6 +75,10 @@ class JobApplicationMgr:
                 raise Exception("Resume is required")
             
             response = await self.jobapplication_collection.insert_one(application_data)
+            applied_student_id=application_data["student_id"]
+            applied_job_id = application_data["job_id"]
+            applied_drive_id = application_data["drive_id"]
+            await job_mgr.apply_to_job(applied_drive_id,applied_job_id, applied_student_id)
             application_data["_id"] = str(response.inserted_id)
             return application_data
         except Exception as e:

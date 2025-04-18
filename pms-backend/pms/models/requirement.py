@@ -18,6 +18,7 @@ class Requirement(BaseModel):
     preferred_qualifications: Optional[List[str]] = None  # Nice-to-have qualifications
     required_certifications: Optional[List[str]] = None  # Required certifications
     language_requirements: Optional[List[str]] = None  # Required languages
+    passout_year: Optional[int] = None
 
 class RequirementUpdate(BaseModel):
     job: Optional[str] = None
@@ -32,3 +33,4 @@ class RequirementUpdate(BaseModel):
     preferred_qualifications: Optional[List[str]] = None  # Nice-to-have qualifications
     required_certifications: Optional[List[str]] = None  # Required certifications
     language_requirements: Optional[List[str]] = None  # Required languages
+    passout_year: Optional[int] = None
