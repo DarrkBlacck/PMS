@@ -10,7 +10,6 @@ import AddJobModal from "../components/AddJobModal";
 import RequirementsModal from "../components/RequirementsModal";
 import PublishDriveModal from "../components/PublishDriveModal";
 import { useDriveManagement } from "../components/useDriveManagement";
-import { MdEdit, MdVisibility } from "react-icons/md";
 
 export default function Edit() {
     const [addCompanyModal, setAddCompanyModal] = useState(false);
@@ -24,6 +23,8 @@ export default function Edit() {
 
     const driveManagement = useDriveManagement();
     const {
+        students,
+        handleFetchStudents,
         drive,
         title, setTitle,
         location, setLocation,
@@ -43,7 +44,7 @@ export default function Edit() {
         startAddingJob,
         startUpdatingJob,
         startDeletingJob,
-        startPublishingDrive, // Make sure this exists in your useDriveManagement hook
+        startPublishingDrive, 
         job_id, setJobId,
         company_id,setCompanyId,
         companyDesc, setCompanyDesc,
@@ -123,8 +124,11 @@ export default function Edit() {
             }
         },
         requirement: {
+            open: async () => {
+              await handleFetchStudents();
+              setRequirementModal(true)
+            },
             close: () => setRequirementModal(false),
-            open: () => setRequirementModal(true),
             submit: () => {
                 startAddingRequirement();
                 setRequirementModal(false);
@@ -171,7 +175,10 @@ export default function Edit() {
     const publishDriveModalProps = {
         isOpen: publishDriveModal,
         onClose: modalHandlers.publish.close,
-        onPublishDrive: modalHandlers.publish.submit
+        onPublishDrive: modalHandlers.publish.submit,
+        jobs,
+        students,
+
     };
 
     const addCompanyModalProps = {
@@ -322,9 +329,9 @@ export default function Edit() {
                 color="primary"
                 thumbIcon={({ isSelected }) => 
                     isSelected ? (
-                    <MdEdit/>
+                    "Edit"
                     ) : (
-                    <MdVisibility />
+                    "Preview"
                     )
                 }
                 onValueChange={setIsEditMode}

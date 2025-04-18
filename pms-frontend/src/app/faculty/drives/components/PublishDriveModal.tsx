@@ -15,19 +15,7 @@ export default function PublishDriveModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalContent>
-        <ModalHeader>Publish Drive</ModalHeader>
-        <ModalBody>
-          <p>Are you sure you want to publish this drive? Once published, it will be visible to all users.</p>
-          <p>Please ensure all details are correct before publishing.</p>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" variant="light" onPress={onClose}>
-            Cancel
-          </Button>
-          <Button color="primary" onPress={onPublishDrive}>
-            Publish
-          </Button>
-        </ModalFooter>
+      <h1>Job wise eligigle students, approve and publish</h1>
       </ModalContent>
     </Modal>
   );

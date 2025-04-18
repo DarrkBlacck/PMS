@@ -1,6 +1,25 @@
 //API.ts
 import { Drive, Company, Job, Requirement } from "./types";
 
+export const fetchStudentsAPI = async () => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/student/get`, {
+        method: "GET",
+    });
+    if (!response.ok) {
+        throw new Error(`Server returned with an error: ${response.status}`);
+    }
+    return await response.json();
+};
+
+export const fetchEligibleStudentsforJobAPI = async (job_id: string) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/job/${job_id}/eligible-students`, {
+        method: "GET",
+    });
+    if (!response.ok) {
+        throw new Error(`Server returned with an error: ${response.status}`);
+    }
+    return await response.json();
+};
 export const fetchCompaniesAPI = async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/company/get`, {
         method: "GET",

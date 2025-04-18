@@ -9,13 +9,19 @@ import {
   deleteJobByDriveCompanyAPI, deleteJobByDriveAPI, deleteDriveAPI, 
   deleteDriveCompanyByCompanyAPI, deleteDriveCompanyByDriveAPI, 
   updateDriveAPI, addRequirementAPI, fetchRequirementsByJobAPI, updateRequirementAPI, 
-  publishDriveAPI
+  publishDriveAPI,
+  fetchStudentsAPI,
+  fetchEligibleStudentsforJobAPI
 } from "./API";
 
 import { Drive, Company, Job, Requirement, ProgressTracker, ActionStates } from "./types";
+import { Student } from "@/app/students/components/types";
 
 export const useDriveManagement = () => {
     const router = useRouter();
+
+    const [students, setStudents] = useState<Student[]>([]);
+    const [jobEligibleStudents, setJobEligibleStudents] = useState<Student[]>([]);
     
     // Drive states
     const [drive, setDrive] = useState<Drive | undefined>();
@@ -174,6 +180,24 @@ export const useDriveManagement = () => {
         
         return Math.min(100, Math.round((progress / totalWeight) * 100));
     }, []);
+
+     // Fetch student data
+      const handleFetchStudents = useCallback(async () => {
+      
+        try {
+          setLoading(true);
+          const response = await fetchStudentsAPI();
+          if (!response) {
+            throw new Error('No student data received');
+          }
+          setStudents(response);
+        } catch (error) {
+          console.error('Error in fetching students data:', error);
+          setError(error instanceof Error ? error.message : 'Failed to fetch students data');
+        } finally {
+          setLoading(false);
+        }
+      },[]);
 
 
     const filterCompanies = useCallback(async () => {
@@ -752,6 +776,22 @@ export const useDriveManagement = () => {
         }
     }, []); 
 
+    const handlefetchEligibleStudentsforJob = useCallback(async (job_id: string) => {
+        try {
+            setLoading(true);
+            const response = await fetchEligibleStudentsforJobAPI(job_id);
+            setJobEligibleStudents(response);
+        } catch (err: unknown) {
+            console.error("Error in fetching eligible students for the job", {
+                message: (err as Error).message,
+                stack: (err as Error).stack
+            });
+            setError((err as Error).message);
+        } finally {
+            setLoading(false);
+        }
+    }, []); 
+
     
 
     const fetchCompleteDrive = useCallback(async (driveId: string) => {
@@ -900,6 +940,10 @@ export const useDriveManagement = () => {
     }, [jobs, calculateJobProgress]);
 
     return {
+
+        students, handleFetchStudents, 
+        handlefetchEligibleStudentsforJob, jobEligibleStudents,
+
         // Drive states
         drive, setDrive,
         title, setTitle,

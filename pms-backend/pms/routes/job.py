@@ -129,10 +129,10 @@ async def delete_job_by_drivecompany(drive_id: str, company_id: str):
             detail=f"Error deleting job: {str(e)}"
         )
 
-@router.get("/jobs/{job_id}/eligible-students", response_model=List[str])
+@router.get("/{job_id}/eligible-students", response_model=List[str])
 async def get_eligible_students_for_job(job_id: str):
     """
-    Retrieves a list of student IDs eligible for a specific job 
+    Retrieves a list of students eligible for a specific job 
     based on defined requirements (passout year, CGPA).
     """
     try:
