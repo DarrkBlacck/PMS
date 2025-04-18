@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import logging
 from pms.models.drive import Drive, DriveUpdate
 from pymongo import ReturnDocument
 from typing import List
@@ -18,7 +19,6 @@ class DriveMgr:
         
     async def get_drives(self):
         try:
-            await self.db.connect()
             drives = await self.drive_collection.find().to_list(length=100)
             if len(drives) == 0:
                 print("No drives added")
@@ -30,7 +30,6 @@ class DriveMgr:
     
     async def get_drive(self, drive_id: str):
         try:
-            await self.db.connect()
             drive = await self.drive_collection.find_one({"_id": ObjectId(drive_id)})
             if drive:
                 drive["_id"] = str(drive["_id"])
@@ -47,7 +46,6 @@ class DriveMgr:
     
     async def add_drive(self, drive: Drive):
         try:
-            await self.db.connect()
             drive_data = drive.model_dump()
             
             # Ensure levels is an empty list if not provided
@@ -70,7 +68,6 @@ class DriveMgr:
     
     async def update_drive(self, drive_id: str, drive: DriveUpdate):
         try:
-            await self.db.connect()
             drive_data = drive.model_dump(exclude_none=True)
             
             # Ensure stages is a list of strings
@@ -98,7 +95,6 @@ class DriveMgr:
     
     async def delete_drive(self, drive_id: str):
         try:
-            await self.db.connect()
             response = await self.drive_collection.delete_one({"_id": ObjectId(drive_id)})
             if response.deleted_count == 0:
                 raise Exception("Drive not found")
@@ -111,7 +107,6 @@ class DriveMgr:
     
     async def apply_to_drive(self, drive_id: str, student_id: str):
         try:
-            await self.db.connect()
             response = await self.drive_collection.find_one_and_update(
                 {"_id": ObjectId(drive_id)},
                 {"$addToSet": {"applied_students": student_id}},  # Use addToSet to avoid duplicates
@@ -128,5 +123,26 @@ class DriveMgr:
             }
         except Exception as e:
             raise Exception(f"Error applying to drive: {str(e)}")
+        
+    async def publish_drive(self, drive_id: str):
+        try:
+            response = await self.drive_collection.find_one_and_update(
+                {"_id" : ObjectId(drive_id)},
+                {"$set": {"published": True}},  # Use $set for clarity
+                return_document= ReturnDocument.AFTER
+            )
+            if not response:
+                raise ValueError("Drive not found")
+        
+            response["_id"] = str(response["_id"]) 
+            return response  # Return the updated document
+        except ValueError as ve:
+            logging.error(f"ValueError: {str(ve)}")
+            raise
+        except Exception as e:
+            logging.error(f"Error publishing the drive: {str(e)}")
+            raise Exception(f"Error publishing the drive: {str(e)}")
+
 
 drive_mgr = DriveMgr()
+

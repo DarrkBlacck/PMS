@@ -71,3 +71,14 @@ async def apply_to_drive(drive_id: str, student_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error applying to drive: {str(e)}"
         )
+    
+@router.patch("/publish/{drive_id}")
+async def publish_drive(drive_id:str):
+    try:
+        response = await drive_mgr.publish_drive(drive_id)
+        return response
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Publishing Drive: {str(e)}"
+        )

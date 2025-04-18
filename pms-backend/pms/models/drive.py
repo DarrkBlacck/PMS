@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from xmlrpc.client import boolean
 from pydantic import BaseModel, EmailStr, constr, Field
 from typing import Dict, Literal, Optional, Annotated, List
 
@@ -19,6 +20,7 @@ class Drive(BaseModel):
     application_deadline: Optional[datetime] = None
     additional_instructions: Optional[str] = None
     form_link: Optional[str] = None
+    published: Optional[bool] = False
 
 
 class DriveUpdate(BaseModel):
@@ -33,3 +35,4 @@ class DriveUpdate(BaseModel):
         application_deadline: Optional[datetime] = None
         additional_instructions: Optional[str] = None
         form_link: Optional[str] = None
+        published: Optional[bool] =None

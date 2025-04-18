@@ -335,3 +335,16 @@ export const deleteRequirementByJobAPI = async (jobId: string) => {
     }
     return await response.json();
 };
+
+
+export const publishDriveAPI = async (driveId: string) => {
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/drive/publish/${driveId}`, {
+        method: "PATCH",
+    });
+    if (!response.ok) {
+        throw new Error(`Server returned with an error: ${response.status}`);
+    }
+    return await response.json();
+
+};

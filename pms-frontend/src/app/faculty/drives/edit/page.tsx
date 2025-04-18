@@ -1,19 +1,23 @@
 'use client';
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Tabs, Tab } from "@heroui/react";
+import { Tabs, Tab, Switch, Button } from "@heroui/react";
 import GeneralDetailsTab from "../components/GeneralDetailsTab";
 import CompanyDetailsTab from "../components/CompanyDetailsTab";
 import JobDetailsTab from "../components/JobDetailsTab";
 import AddCompanyModal from "../components/AddCompanyModal";
 import AddJobModal from "../components/AddJobModal";
 import RequirementsModal from "../components/RequirementsModal";
+import PublishDriveModal from "../components/PublishDriveModal";
 import { useDriveManagement } from "../components/useDriveManagement";
+import { MdEdit, MdVisibility } from "react-icons/md";
 
 export default function Edit() {
     const [addCompanyModal, setAddCompanyModal] = useState(false);
     const [addJobModal, setAddJobModal] = useState(false);
     const [requirementModal, setRequirementModal] = useState(false);
+    const [publishDriveModal, setPublishDriveModal] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
     const searchParams = useSearchParams();
     const id = searchParams.get("id");
@@ -39,6 +43,7 @@ export default function Edit() {
         startAddingJob,
         startUpdatingJob,
         startDeletingJob,
+        startPublishingDrive, // Make sure this exists in your useDriveManagement hook
         job_id, setJobId,
         company_id,setCompanyId,
         companyDesc, setCompanyDesc,
@@ -81,6 +86,8 @@ export default function Edit() {
         startAddingRequirement,
     } = driveManagement;
 
+    // Add state for edit/preview mode
+
     useEffect(() => {
         if (!id) return;
         
@@ -122,6 +129,14 @@ export default function Edit() {
                 startAddingRequirement();
                 setRequirementModal(false);
             }
+        },
+        publish: {
+            close: () => setPublishDriveModal(false),
+            open: () => setPublishDriveModal(true),
+            submit: () => {
+                startPublishingDrive();
+                setPublishDriveModal(false);
+            }
         }
     };
 
@@ -151,6 +166,12 @@ export default function Edit() {
         driveProgress,
         form_link: driveform_link,
         setFormLink: setDriveFormLink,
+    };
+
+    const publishDriveModalProps = {
+        isOpen: publishDriveModal,
+        onClose: modalHandlers.publish.close,
+        onPublishDrive: modalHandlers.publish.submit
     };
 
     const addCompanyModalProps = {
@@ -290,54 +311,65 @@ export default function Edit() {
         setFormLink: setJobFormLink,
     };
 
+
     return (
         <div className="flex flex-col items-center">
-            <AddCompanyModal {...addCompanyModalProps} />
-            <AddJobModal {...addJobModalProps} />
-            <RequirementsModal {...requirementModalProps} />
-            
-            <Tabs 
-                aria-label="Drive details"
-                size="lg"
+          <div className="w-full flex justify-end items-center gap-4 mb-4">
+            <div className="flex items-center gap-2">
+            <Switch
+                defaultSelected
+                size="sm"
                 color="primary"
-                selectedKey={selected}
-                onSelectionChange={(key) => setSelectedState(key.toString())}
-                disabledKeys={disabled}
-                classNames={{
-                    tabList: "flex items-center gap-4 border-b pb-2 mt-4",
-                }}
-            >
-                <Tab key="general" title="General Details">
-                    <GeneralDetailsTab {...generalDetailsProps} />
-                </Tab>
-
-                <Tab key="Companies" title="Company Details">
-                    <CompanyDetailsTab {...companyDetailsProps} />
-                </Tab>
-
-                <Tab key="Jobs" title="Job Details">
-                    <JobDetailsTab {...jobDetailsProps} />
-                </Tab>
-            </Tabs>
+                thumbIcon={({ isSelected }) => 
+                    isSelected ? (
+                    <MdEdit/>
+                    ) : (
+                    <MdVisibility />
+                    )
+                }
+                onValueChange={setIsEditMode}
+                >
+                {isEditMode ? "Edit" : "Preview"}
+                </Switch>
+              
+              <Button 
+                color="primary" 
+                variant="solid"
+                onPress={modalHandlers.publish.open}
+              >
+                Publish Drive
+              </Button>
+            </div>
+          </div>
+          
+          <AddCompanyModal {...addCompanyModalProps} />
+          <AddJobModal {...addJobModalProps} />
+          <RequirementsModal {...requirementModalProps} />
+          <PublishDriveModal {...publishDriveModalProps} />
+      
+          <Tabs 
+            aria-label="Drive details"
+            size="lg"
+            color="primary"
+            selectedKey={selected}
+            onSelectionChange={(key) => setSelectedState(key.toString())}
+            disabledKeys={disabled}
+            classNames={{
+              tabList: "flex items-center gap-4 border-b pb-2 mt-4",
+            }}
+          >
+            <Tab key="general" title="General Details">
+              <GeneralDetailsTab {...generalDetailsProps} />
+            </Tab>
+      
+            <Tab key="Companies" title="Company Details">
+              <CompanyDetailsTab {...companyDetailsProps} />
+            </Tab>
+      
+            <Tab key="Jobs" title="Job Details">
+              <JobDetailsTab {...jobDetailsProps} />
+            </Tab>
+          </Tabs>
         </div>
-    );
+      );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

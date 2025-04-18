@@ -70,6 +70,7 @@ export interface ProgressTracker {
 export interface ActionStates {
     addingDrive: boolean;
     updatingDrive: boolean;
+    publishingDrive: boolean;
     deletingDrive: boolean;
     addingCompany: boolean;
     updatingCompany: boolean;
