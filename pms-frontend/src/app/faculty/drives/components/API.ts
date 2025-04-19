@@ -1,5 +1,6 @@
 //API.ts
 import { Drive, Company, Job, Requirement } from "./types";
+import { Performance } from "@/app/students/components/types";
 
 export const fetchStudentsAPI = async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/student/get`, {
@@ -381,3 +382,11 @@ export const setEligibleStudentsforJobAPI = async (job_id: string, studentList: 
     }
     return await response.json();
 };
+
+export const fetchAllPerformancesAPI = async (): Promise<Performance[]> => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/student-performance/get`); // Example endpoint
+    if (!response.ok) {
+        throw new Error(`Failed to fetch all performances: ${response.status}`);
+    }
+    return await response.json();
+  };

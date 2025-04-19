@@ -78,9 +78,26 @@ async def add_student_performance(
             detail=f"Error processing request: {str(e)}"
         )
 
+@router.get("/get/", response_model=StudentPerformance)
+async def get_student_performances():
+    try:
+        return await student_performance_mgr.get_all_student_performances()   
+    except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Error fetching whole student performances: {str(e)}"
+            )
+
+
 @router.get("/get/{student_id}", response_model=StudentPerformance)
-async def get_student_performances(student_id: str):
-    return await student_performance_mgr.get_student_performances(student_id)
+async def get_student_performance(student_id: str):
+    try:
+        return await student_performance_mgr.get_student_performance(student_id)
+    except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Error fetching student perofrmance of {student_id} {str(e)}"
+            )
 
 @router.patch("/update/{student_id}")
 async def update_student_performance(

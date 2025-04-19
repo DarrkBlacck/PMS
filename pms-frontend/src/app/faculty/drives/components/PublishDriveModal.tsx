@@ -153,8 +153,6 @@ export default function PublishDriveModal({
 }
 
 
-// --- Dummy Components (Keep or replace with your actual implementations) ---
-
 interface StudentListProps {
     students: Student[];
     onRemoveStudent: (studentId: string) => void;
@@ -205,7 +203,7 @@ const AddStudentDropdown: React.FC<AddStudentDropdownProps> = ({ students, onAdd
                 <option value="">{isLoading ? "Loading students..." : students.length === 0 ? "No students available to add" : "Select student to add..."}</option>
                 {students.map(student => (
                     <option key={student._id} value={student._id}>
-                        {student.first_name} {student.last_name} ({student._id})
+                        {student.first_name} {student.last_name} ({student._id}) - {student.email}
                     </option>
                 ))}
             </select>

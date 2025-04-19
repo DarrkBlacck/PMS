@@ -29,7 +29,7 @@ class StudentPerformanceMgr:
             raise Exception(f"Error fetching all student performances: {str(e)}")
 
 
-    async def get_student_performances(self, student_id: str):
+    async def get_student_performance(self, student_id: str):
         try:
             await self.db.connect()
             student_performance = await self.student_performance_collection.find_one({"student_id": student_id})

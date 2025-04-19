@@ -104,8 +104,8 @@ export interface Performance {
   twelfth_cgpa: number;
   degree_cgpa: number;
   mca_cgpa: number[];
-  certification_files: FileInfo[]; // Updated to use FileInfo[]
-  job_application_files: FileInfo[]; // Updated to use FileInfo[]
+  certification_files: FileInfo[]; 
+  job_application_files: FileInfo[]; 
   skills: string[];
   current_status: string;
   year: number;

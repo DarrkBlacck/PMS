@@ -1,8 +1,8 @@
 // hooks/usePublishManagement.ts
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { fetchEligibleStudentsforJobAPI, fetchStudentsAPI } from './API'; // Assuming API functions are here or imported correctly
+import { fetchAllPerformancesAPI, fetchEligibleStudentsforJobAPI, fetchStudentsAPI } from './API'; // Assuming API functions are here or imported correctly
 import { Job } from './types'; // Assuming types are defined/imported correctly
-import { Student } from '@/app/students/components/types';
+import { Performance, Student } from '@/app/students/components/types';
 
 interface UsePublishManagementProps {
     isOpen: boolean;
@@ -10,9 +10,15 @@ interface UsePublishManagementProps {
     jobs: Job[] | undefined; // Jobs for the current drive
 }
 
+interface StudentWithPerformance {
+    student: Student; // The full student object
+    performance: Performance | null; // The corresponding performance object (or null if not found)
+  }
+
 export const usePublishManagement = ({ isOpen, drive_id, jobs = [] }: UsePublishManagementProps) => {
     const [activeJobId, setActiveJobId] = useState<string | null>(null);
     const [allStudents, setAllStudents] = useState<Student[]>([]); // For the "Add" dropdown
+    const [allPerformancesMap, setAllPerformancesMap] = useState<Record<string, Performance>>({});
 
     // State for caching and modifications
     const [eligibleStudentsCache, setEligibleStudentsCache] = useState<Record<string, string[]>>({});
@@ -21,8 +27,8 @@ export const usePublishManagement = ({ isOpen, drive_id, jobs = [] }: UsePublish
     // State for loading/error handling
     const [jobLoadingStates, setJobLoadingStates] = useState<Record<string, boolean>>({});
     const [jobErrorStates, setJobErrorStates] = useState<Record<string, string | null>>({});
-    const [isFetchingAllStudents, setIsFetchingAllStudents] = useState(false);
-    const [generalError, setGeneralError] = useState<string | null>(null);
+    const [isFetchingInitialData, setIsFetchingInitialData] = useState(false); // Combined loading for students + performances
+    const [initialDataError, setInitialDataError] = useState<string | null>(null); // Combined error for students + performances
 
     // --- Helper: Reset State ---
     const resetState = useCallback(() => {
@@ -33,8 +39,8 @@ export const usePublishManagement = ({ isOpen, drive_id, jobs = [] }: UsePublish
         setModifiedEligibleStudents({});
         setJobLoadingStates({});
         setJobErrorStates({});
-        setGeneralError(null);
-        // setIsFetchingAllStudents(false); // Don't reset this unless refetching
+        setInitialDataError(null);
+        // setIsFetchingInitialData(false); // Don't reset this unless refetching
     }, [jobs]);
 
     // --- Data Fetching ---
@@ -42,44 +48,56 @@ export const usePublishManagement = ({ isOpen, drive_id, jobs = [] }: UsePublish
     // Fetch all students once when the modal opens or drive_id changes
     useEffect(() => {
         if (isOpen && drive_id) {
-            const loadAllStudents = async () => {
-                setIsFetchingAllStudents(true);
-                setGeneralError(null);
+            const loadInitialData = async () => {
+                setIsFetchingInitialData(true);
+                setInitialDataError(null);
+                setAllStudents([]);
+                setAllPerformancesMap({});
+                resetState(); // Reset job-specific caches/states
                 try {
-                    const students = await fetchStudentsAPI(); // Use the existing API call
-                    setAllStudents(students || []);
+                    // Fetch students and performances concurrently
+                    const [studentsResponse, performancesResponse] = await Promise.all([
+                        fetchStudentsAPI(),
+                        fetchAllPerformancesAPI() // Fetch all performances
+                    ]);
+
+                    setAllStudents(studentsResponse || []);
+
+                    // Create the performance map from the fetched list
+                    const perfMap: Record<string, Performance> = {};
+                    (performancesResponse || []).forEach((perf) => {
+                        if (perf && perf.student_id) {
+                            perfMap[perf.student_id] = perf;
+                        }
+                    });
+                    setAllPerformancesMap(perfMap);
+
                 } catch (error) {
-                    console.error("Error fetching all students:", error);
-                    setGeneralError(`Failed to load student list: ${(error as Error).message}`);
+                    console.error("Error fetching initial modal data (students/performances):", error);
+                    setInitialDataError(`Failed to load initial data: ${(error as Error).message}`);
                 } finally {
-                    setIsFetchingAllStudents(false);
+                    setIsFetchingInitialData(false);
                 }
             };
-            loadAllStudents();
+            loadInitialData();
         }
-        // Reset internal state if drive_id changes while open, or when modal opens
-        resetState();
-
-    }, [isOpen, drive_id, resetState]); // Include resetState in dependencies
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, drive_id]); // Rerun only when modal opens or drive changes
      // Set initial active job ID when jobs load
      useEffect(() => {
-        if (isOpen && jobs.length > 0 && !activeJobId) {
+        if (isOpen && !isFetchingInitialData && jobs.length > 0 && !activeJobId) {
             setActiveJobId(jobs[0]._id);
         }
-    }, [isOpen, jobs, activeJobId]);
+    }, [isOpen, isFetchingInitialData, jobs, activeJobId]);
 
 
-    // Fetch eligible students for the active job (if not cached/modified)
+    // Fetch eligible student IDs for the active job (if not cached/modified)
     const handleFetchEligibleStudents = useCallback(async (job_id: string) => {
         if (!job_id || eligibleStudentsCache[job_id] || jobLoadingStates[job_id]) {
-            return; // Don't fetch if no job, already cached, or already loading
+            return; 
         }
-
         setJobLoadingStates(prev => ({ ...prev, [job_id]: true }));
         setJobErrorStates(prev => ({ ...prev, [job_id]: null }));
-        setGeneralError(null);
-
         try {
             const response = await fetchEligibleStudentsforJobAPI(job_id);
             setEligibleStudentsCache(prev => ({ ...prev, [job_id]: response || [] }));
@@ -89,48 +107,64 @@ export const usePublishManagement = ({ isOpen, drive_id, jobs = [] }: UsePublish
         } finally {
             setJobLoadingStates(prev => ({ ...prev, [job_id]: false }));
         }
-    }, [eligibleStudentsCache, jobLoadingStates]); // Dependencies
+    }, [eligibleStudentsCache, jobLoadingStates]);
 
-    // Trigger fetch when activeJobId changes and data isn't modified/cached
+    // Trigger fetch eligible IDs when activeJobId changes and data isn't modified/cached
     useEffect(() => {
-        if (activeJobId && !modifiedEligibleStudents[activeJobId]) {
+        // Ensure initial data is loaded before fetching eligible IDs
+        if (activeJobId && !isFetchingInitialData && !modifiedEligibleStudents[activeJobId]) {
              handleFetchEligibleStudents(activeJobId);
         }
-    }, [activeJobId, modifiedEligibleStudents, handleFetchEligibleStudents]);
+    }, [activeJobId, isFetchingInitialData, modifiedEligibleStudents, handleFetchEligibleStudents]);
 
 
-    // --- State Derivation (using useMemo for performance) ---
+    // --- State Derivation ---
 
-    // Get the list of student IDs to display (prioritizes modified list)
     const currentDisplayedStudentIds = useMemo((): string[] => {
         if (!activeJobId) return [];
-        // Return modified list if it exists, otherwise the cached list, or empty array
         return modifiedEligibleStudents[activeJobId] ?? eligibleStudentsCache[activeJobId] ?? [];
     }, [activeJobId, modifiedEligibleStudents, eligibleStudentsCache]);
 
-    // Create a map of all students for efficient lookup
+    // Create a map of all students for efficient lookup (only needed once)
     const allStudentsMap = useMemo(() => {
         return new Map(allStudents.map(s => [s._id, s]));
     }, [allStudents]);
 
-    // Get full student objects for the displayed list
-    const currentDisplayedStudents = useMemo((): Student[] => {
-        return currentDisplayedStudentIds
-            .map(id => allStudentsMap.get(id))
-            .filter((s): s is Student => s !== undefined); // Type guard to filter out undefined
-    }, [currentDisplayedStudentIds, allStudentsMap]);
+    // Derive Combined Student + Performance Data using the allPerformancesMap
+    const currentDisplayedStudentsWithPerformance = useMemo((): StudentWithPerformance[] => {
+        
+        const combinedList: StudentWithPerformance[] = []; // Initialize an empty array of the correct final type
 
-     // Get students available to be added (all students minus those already in the current list)
+        currentDisplayedStudentIds.forEach(id => {
+            const student = allStudentsMap.get(id);
+            
+            // Only proceed if the student basic info was found
+            if (student) { 
+                // Look up performance in the map fetched initially
+                const performance : Performance | null = allPerformancesMap[id] || null; 
+                
+                // Create the combined object and push it to the list
+                // This object matches the StudentWithPerformance interface
+                combinedList.push({ student, performance }); 
+            } 
+            // If student is not found in allStudentsMap, we simply skip adding anything for this ID.
+        });
+
+        return combinedList; // Return the correctly typed list
+
+    }, [currentDisplayedStudentIds, allStudentsMap, allPerformancesMap]); // Dependencies remain the same
+
+
+     // Get students available to be added
      const availableToAddStudents = useMemo((): Student[] => {
         const currentIdsSet = new Set(currentDisplayedStudentIds);
         return allStudents.filter(s => !currentIdsSet.has(s._id));
     }, [allStudents, currentDisplayedStudentIds]);
 
     // --- Event Handlers ---
-
     const handleTabChange = useCallback((newJobId: string) => {
         setActiveJobId(newJobId);
-        // Fetching is handled by the useEffect watching activeJobId
+        // Fetching eligible IDs is handled by the useEffect watching activeJobId
     }, []);
 
     const handleRemoveStudent = useCallback((studentIdToRemove: string) => {
@@ -155,11 +189,11 @@ export const usePublishManagement = ({ isOpen, drive_id, jobs = [] }: UsePublish
     }, [activeJobId, modifiedEligibleStudents, eligibleStudentsCache]);
 
     // --- Data for Publishing ---
-
     // Function to get the final map of job_id -> student_id[]
     const getFinalStudentMap = useCallback((): Record<string, string[]> => {
          const finalMap: Record<string, string[]> = {};
-         jobs.forEach(job => {
+         // Ensure jobs is an array before iterating
+         (jobs || []).forEach(job => {
              // Prioritize modified list, fall back to cache, then empty array
              finalMap[job._id] = modifiedEligibleStudents[job._id] ?? eligibleStudentsCache[job._id] ?? [];
          });
@@ -170,22 +204,20 @@ export const usePublishManagement = ({ isOpen, drive_id, jobs = [] }: UsePublish
     return {
         activeJobId,
         handleTabChange,
+        currentDisplayedStudentsWithPerformance, // Use this for the list
+        availableToAddStudents, // For dropdown
 
-        // Data for the active tab's display
-        currentDisplayedStudents,
-        availableToAddStudents,
-        isLoadingCurrentJob: activeJobId ? (jobLoadingStates[activeJobId] ?? false) : false,
-        errorCurrentJob: activeJobId ? (jobErrorStates[activeJobId] ?? null) : null,
+        // Loading/Error for fetching eligible IDs for the *current* job tab
+        isLoadingCurrentJobEligibleIds: activeJobId ? (jobLoadingStates[activeJobId] ?? false) : false,
+        errorCurrentJobEligibleIds: activeJobId ? (jobErrorStates[activeJobId] ?? null) : null,
 
-        // Handlers for modification
         handleAddStudent,
         handleRemoveStudent,
 
-        // Loading/Error states for supporting elements
-        isFetchingAllStudents,
-        generalError, // For errors like failing to fetch all students
+        // Loading/Error states for the initial data load (students + all performances)
+        isFetchingInitialData,
+        initialDataError,
 
-        // Function to get final data
         getFinalStudentMap,
     };
 };
