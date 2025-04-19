@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { fetchAllPerformancesAPI, fetchEligibleStudentsforJobAPI, fetchStudentsAPI } from './API'; // Assuming API functions are here or imported correctly
 import { Job } from './types'; // Assuming types are defined/imported correctly
-import { Performance, Student } from '@/app/students/components/types';
+import { Performance, Student, StudentWithPerformance } from '@/app/students/components/types';
 
 interface UsePublishManagementProps {
     isOpen: boolean;
@@ -10,10 +10,7 @@ interface UsePublishManagementProps {
     jobs: Job[] | undefined; // Jobs for the current drive
 }
 
-interface StudentWithPerformance {
-    student: Student; // The full student object
-    performance: Performance | null; // The corresponding performance object (or null if not found)
-  }
+
 
 export const usePublishManagement = ({ isOpen, drive_id, jobs = [] }: UsePublishManagementProps) => {
     const [activeJobId, setActiveJobId] = useState<string | null>(null);

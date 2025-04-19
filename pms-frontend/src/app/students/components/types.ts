@@ -113,6 +113,11 @@ export interface Performance {
   linkedin_url: string;
 }
 
+export interface StudentWithPerformance {
+    student: Student; // The full student object
+    performance: Performance | null; // The corresponding performance object (or null if not found)
+  }
+
 export interface JobApplication {
   _id?: string;
   student_id: string;

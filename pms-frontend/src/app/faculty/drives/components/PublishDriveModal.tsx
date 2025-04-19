@@ -1,13 +1,12 @@
 // components/PublishDriveModal.tsx
 import React, { useState } from 'react';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@heroui/react";
-// Assuming Tabs, Tab, StudentList, AddStudentDropdown components exist and are imported
+// Assuming Tabs, Tab components exist and are imported if needed
 // import { Tabs, Tab } from './YourTabComponent'; 
-// import StudentList from './StudentList'; 
-// import AddStudentDropdown from './AddStudentDropdown'; 
 import { usePublishManagement } from './usePublishManagement'; // Adjust path as needed
-import { Job } from './types'; // Adjust path as needed
-import { Student } from '@/app/students/components/types';
+// Import necessary types, including the helper type and your Performance type
+import { Job } from './types'; 
+import { Student, StudentWithPerformance } from '@/app/students/components/types';
 
 interface PublishDriveModalProps {
     isOpen: boolean;
@@ -28,17 +27,18 @@ export default function PublishDriveModal({
     onPublishDrive
 }: PublishDriveModalProps) {
 
+    // Updated destructuring based on the modified usePublishManagement hook
     const {
         activeJobId,
         handleTabChange,
-        currentDisplayedStudents,
+        currentDisplayedStudentsWithPerformance, // <-- Use the combined data
         availableToAddStudents,
-        isLoadingCurrentJob,
-        errorCurrentJob,
+        isLoadingCurrentJobEligibleIds, // Loading state for the current tab's eligible IDs
+        errorCurrentJobEligibleIds,     // Error state for the current tab's eligible IDs
         handleAddStudent,
         handleRemoveStudent,
-        isFetchingAllStudents,
-        generalError,
+        isFetchingInitialData,          // Loading state for ALL students + ALL performances
+        initialDataError,               // Error state for ALL students + ALL performances
         getFinalStudentMap,
     } = usePublishManagement({ isOpen, drive_id, jobs });
 
@@ -75,22 +75,27 @@ export default function PublishDriveModal({
              // Handle case where there are no jobs
              return jobs.length === 0 ? <p>No jobs defined for this drive.</p> : <p>Select a job tab.</p>;
         }
-        if (isLoadingCurrentJob) return <p>Loading eligible students...</p>;
-        if (errorCurrentJob) return <p className="text-red-600">Error loading students: {errorCurrentJob}</p>;
-        if (generalError) return <p className="text-red-600">Error: {generalError}</p>
+        
+        // Show loading if initial data OR current job's eligible IDs are loading
+        if (isFetchingInitialData) return <p>Loading initial student data...</p>; 
+        if (isLoadingCurrentJobEligibleIds) return <p>Loading eligible students for this job...</p>;
+        
+        // Prioritize errors
+        if (initialDataError) return <p className="text-red-600">Error loading initial data: {initialDataError}</p>;
+        if (errorCurrentJobEligibleIds) return <p className="text-red-600">Error loading eligible students: {errorCurrentJobEligibleIds}</p>;
 
         return (
             <div>
-                {/* Component to add students */}
+                {/* Pass isFetchingInitialData to disable dropdown while students/performances load */}
                 <AddStudentDropdown
                     students={availableToAddStudents}
                     onAddStudent={handleAddStudent}
-                    isLoading={isFetchingAllStudents}
+                    isLoading={isFetchingInitialData} 
                 />
 
-                {/* Component to display the list and handle removals */}
+                {/* Pass the combined data structure to StudentList */}
                 <StudentList
-                    students={currentDisplayedStudents}
+                    studentsWithPerformance={currentDisplayedStudentsWithPerformance} 
                     onRemoveStudent={handleRemoveStudent}
                 />
             </div>
@@ -103,20 +108,25 @@ export default function PublishDriveModal({
             <ModalContent>
                 <ModalHeader>Publish Drive: {driveName}</ModalHeader>
                 <ModalBody>
-                    {jobs.length === 0 ? (
+                    {/* Show loading indicator while fetching initial data */}
+                    {isFetchingInitialData ? (
+                        <div className="flex justify-center items-center min-h-[200px]">
+                            <p>Loading drive data...</p> {/* Or use a spinner component */}
+                        </div>
+                    ) : jobs.length === 0 ? (
                          <p>No jobs found for this drive. Add jobs before publishing.</p>
                     ) : (
-                        // Replace with actual Tab component implementation
+                        // Replace with actual Tab component implementation if needed, otherwise use buttons
                         <div className="tabs-container border border-gray-300 rounded"> 
-                           <div className="tab-list flex border-b border-gray-300 bg-gray-100" role="tablist">
-                                {jobs.map(job => (
+                           <div className="tab-list flex flex-wrap border-b border-gray-300 bg-gray-100" role="tablist"> {/* Added flex-wrap */}
+                                {(jobs || []).map(job => ( // Ensure jobs is an array
                                     <button
                                         key={job._id}
                                         role="tab"
                                         aria-selected={activeJobId === job._id}
                                         onClick={() => handleTabChange(job._id)}
                                         // Example styling - adapt to your design system
-                                        className={`px-4 py-2 border-b-2 focus:outline-none ${
+                                        className={`px-4 py-2 border-b-2 focus:outline-none whitespace-nowrap ${ // Added whitespace-nowrap
                                             activeJobId === job._id 
                                             ? 'border-blue-500 text-blue-600 bg-white font-semibold' 
                                             : 'border-transparent text-gray-600 hover:text-blue-500 hover:border-gray-300'
@@ -126,12 +136,13 @@ export default function PublishDriveModal({
                                     </button>
                                 ))}
                             </div>
-                           <div className="tab-panel p-4 bg-white">
+                           {/* Added min-height to prevent collapse when loading */}
+                           <div className="tab-panel p-4 bg-white min-h-[300px]"> 
                                 {renderActiveJobContent()}
                            </div>
                         </div>
                     )}
-                     {publishError && <p className="text-red-600 mt-4">Publishing Error: {publishError}</p>}
+                     {publishError && <p className="text-red-600 mt-4 text-center">Publishing Error: {publishError}</p>}
                 </ModalBody>
                 <ModalFooter>
                     <Button variant="shadow" onPress={handleClose} disabled={isPublishing}>
@@ -140,7 +151,8 @@ export default function PublishDriveModal({
                     <Button 
                         color="primary"
                         onPress={handlePublishClick} 
-                        disabled={isPublishing || jobs.length === 0 || !!generalError} // Disable if no jobs or critical error
+                        // Disable if publishing, initial data failed, or no jobs
+                        disabled={isPublishing || jobs.length === 0 || !!initialDataError} 
                         // Add loading state if Button component supports it
                         // isLoading={isPublishing} 
                     >
@@ -153,30 +165,78 @@ export default function PublishDriveModal({
 }
 
 
+// --- UPDATED StudentList Component ---
+// Accepts the combined StudentWithPerformance structure
 interface StudentListProps {
-    students: Student[];
+    studentsWithPerformance: StudentWithPerformance[]; 
     onRemoveStudent: (studentId: string) => void;
 }
-const StudentList: React.FC<StudentListProps> = ({ students, onRemoveStudent }) => (
-    <ul className="list-none p-0 mt-4 max-h-60 overflow-y-auto border rounded"> {/* Added scroll */}
-        {students.length === 0 && <li className="p-2 text-gray-500">No eligible students selected.</li>}
-        {students.map((student, index) => (
-            <li key={student._id} className={`flex justify-between items-center p-2 ${index < students.length - 1 ? 'border-b' : ''}`}>
-                <span>{student.first_name} {student.last_name} <span className="text-xs text-gray-500">({student._id})</span></span>
-                <Button 
-                    size="sm" 
-                    variant="light" 
-                    color="danger" 
-                    onPress={() => onRemoveStudent(student._id)}
-                    className="ml-2" // Added margin
-                >
-                    Remove
-                </Button>
-            </li>
-        ))}
-    </ul>
-);
 
+const StudentList: React.FC<StudentListProps> = ({ studentsWithPerformance, onRemoveStudent }) => {
+    
+    // Helper to format CGPA - adjust as needed
+    const formatCGPA = (cgpa: number | null | undefined): string => {
+        // Check for null or undefined explicitly
+        if (cgpa === null || cgpa === undefined) return 'N/A';
+        return cgpa.toFixed(2);
+    }
+    
+    // Helper to format latest MCA CGPA
+    const formatLatestMcaCGPA = (mcaCgpa: number[] | null | undefined): string => {
+        if (mcaCgpa && mcaCgpa.length > 0) {
+            // Assuming the last element is the latest and is a valid number
+            const latest = mcaCgpa[mcaCgpa.length - 1];
+            if (typeof latest === 'number' && !isNaN(latest)) {
+                return latest.toFixed(2);
+            }
+        }
+        return 'N/A';
+    }
+
+    return (
+        // Increased max height for better scrolling with more details
+        <div className="mt-4 border rounded max-h-96 overflow-y-auto"> 
+            {studentsWithPerformance.length === 0 && <p className="p-3 text-gray-500">No eligible students selected.</p>}
+            {studentsWithPerformance.map(({ student, performance }, index) => (
+                <div key={student._id} className={`p-3 ${index < studentsWithPerformance.length - 1 ? 'border-b' : ''}`}>
+                    {/* Student Name and Remove Button */}
+                    <div className="flex justify-between items-start mb-1">
+                        <span className="font-medium">{student.first_name} {student.last_name} 
+                            <span className="text-xs text-gray-500 ml-1">({student._id})</span>
+                        </span>
+                        <Button 
+                            size="sm" 
+                            variant="light" 
+                            color="danger" 
+                            onPress={() => onRemoveStudent(student._id)}
+                            className="ml-2 flex-shrink-0" // Prevent button shrinking
+                        >
+                            Remove
+                        </Button>
+                    </div>
+                    {/* Display Performance Details */}
+                    {performance ? (
+                        // Using grid for better alignment of performance data
+                        <div className="text-sm text-gray-600 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-1">
+                           <span>10th: <span className="font-medium">{formatCGPA(performance.tenth_cgpa)}</span></span>
+                           {/* Ensure correct field name for 12th - using twelfth_cgpa from your type */}
+                           <span>12th: <span className="font-medium">{formatCGPA(performance.twelfth_cgpa)}</span></span> 
+                           <span>Degree: <span className="font-medium">{formatCGPA(performance.degree_cgpa)}</span></span>
+                           <span>MCA: <span className="font-medium">{formatLatestMcaCGPA(performance.mca_cgpa)}</span></span>
+                           {/* Add more fields if needed, e.g., Skills */}
+                           {/* <span className="col-span-full">Skills: {performance.skills?.join(', ') || 'N/A'}</span> */}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-gray-400 italic">Performance data not available.</p>
+                    )}
+                </div>
+            ))}
+        </div>
+    );
+};
+
+
+// --- AddStudentDropdown Component (Remains Unchanged) ---
 interface AddStudentDropdownProps {
     students: Student[];
     onAddStudent: (studentId: string) => void;
@@ -213,3 +273,4 @@ const AddStudentDropdown: React.FC<AddStudentDropdownProps> = ({ students, onAdd
         </div>
     );
 };
+
