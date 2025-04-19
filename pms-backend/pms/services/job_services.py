@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
 import logging
+
+from fastapi.exceptions import ResponseValidationError
+from pydantic import ValidationError
 from pms.models.job import Job, JobUpdate
 from pymongo import ReturnDocument
 from typing import Any, List, Dict
@@ -219,7 +222,7 @@ class JobMgr:
                     student_passout_year = join_date.year + 2
                 
                 if req_passout_year is not None:
-                    if student_passout_year is None or student_passout_year != req_passout_year:
+                    if student_passout_year is None or student_passout_year > req_passout_year:
                         is_eligible = False
                         print(f"Student {student_id} ineligible: Passout year mismatch (Req: {req_passout_year}, Stud: {student_passout_year})")
 
@@ -276,9 +279,21 @@ class JobMgr:
                     eligible_student_ids.append(student_id)
                     print(f"Student {student_id} is eligible.")
             
-            eligible_students = await student_mgr.get_students_by_ids(eligible_student_ids)
-
-            return eligible_students
+            return eligible_student_ids
+        
+        except ResponseValidationError as rve:
+            logging.error(f"ResponseValidationError in get_eligible_students for job {job_id}: {str(rve)}")
+            raise Exception(f"Failed to return eligible students due to response validation error: {str(rve)}")
+            
+        except ValidationError as ve:
+            logging.error(f"ValidationError in get_eligible_students for job {job_id}: {str(ve)}")
+            raise Exception(f"Failed to determine eligible students due to validation error: {str(ve)}")
+        except KeyError as ke:
+            logging.error(f"KeyError in get_eligible_students for job {job_id}: {str(ke)}")
+            raise Exception(f"Failed to determine eligible students due to missing key: {str(ke)}")
+        except TypeError as te:
+            logging.error(f"TypeError in get_eligible_students for job {job_id}: {str(te)}")
+            raise Exception(f"Failed to determine eligible students due to type error: {str(te)}")
 
         except Exception as e:
             # Log the error for debugging
@@ -296,6 +311,9 @@ class JobMgr:
             if not response:
                 raise ValueError("Job not found")
             response["_id"] = str(response["_id"]) 
+            print(response)
+            drive_id = response["drive"]
+            await drive_mgr.set_eligible_students_for_drive(drive_id)
             return response  # Return the updated document
         except ValueError as ve:
             logging.error(f"ValueError: {str(ve)}")

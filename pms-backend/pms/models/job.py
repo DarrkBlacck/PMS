@@ -12,7 +12,7 @@ class Job(BaseModel):
     title: str
     desc: Optional[str] = None
     loc: Optional[str] = None
-    job_type: Optional[Literal["Full-time", "Part-time", "Contract", "Remote"]] = "Full-time"
+    job_type: Optional[Literal["full-time", "part-time", "Contract", "Remote"]] = "Full-time"
     requirement: Optional[str] = None
     experience: Optional[int] = 0
     salary: Optional[float] = None
@@ -34,7 +34,7 @@ class JobUpdate(BaseModel):
     title: Optional[str] = None
     desc: Optional[str] = None
     loc: Optional[str] = None
-    job_type: Optional[Literal["Full-time", "Part-time", "Contract", "Remote"]] = None
+    job_type: Optional[Literal["full-time", "part-time", "Contract", "Remote"]] = None
     requirement: Optional[str] = None
     experience: Optional[int] = None
     salary: Optional[float] = None
