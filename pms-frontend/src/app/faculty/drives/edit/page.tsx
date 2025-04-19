@@ -9,6 +9,7 @@ import AddCompanyModal from "../components/AddCompanyModal";
 import AddJobModal from "../components/AddJobModal";
 import RequirementsModal from "../components/RequirementsModal";
 import PublishDriveModal from "../components/PublishDriveModal";
+import { Job } from "../components/types";
 import { useDriveManagement } from "../components/useDriveManagement";
 
 export default function Edit() {
@@ -23,8 +24,6 @@ export default function Edit() {
 
     const driveManagement = useDriveManagement();
     const {
-        students,
-        handleFetchStudents,
         drive,
         title, setTitle,
         location, setLocation,
@@ -44,7 +43,6 @@ export default function Edit() {
         startAddingJob,
         startUpdatingJob,
         startDeletingJob,
-        startPublishingDrive, 
         job_id, setJobId,
         company_id,setCompanyId,
         companyDesc, setCompanyDesc,
@@ -124,11 +122,8 @@ export default function Edit() {
             }
         },
         requirement: {
-            open: async () => {
-              await handleFetchStudents();
-              setRequirementModal(true)
-            },
             close: () => setRequirementModal(false),
+            open: () => setRequirementModal(true),
             submit: () => {
                 startAddingRequirement();
                 setRequirementModal(false);
@@ -138,11 +133,31 @@ export default function Edit() {
             close: () => setPublishDriveModal(false),
             open: () => setPublishDriveModal(true),
             submit: () => {
-                startPublishingDrive();
+                // startPublishingDrive();
                 setPublishDriveModal(false);
             }
         }
     };
+
+    const publishDriveModalProps = {
+            isOpen: publishDriveModal,
+            onClose: modalHandlers.publish.close,
+             drive_id, // Pass drive_id
+             drivetitle: title, // Pass drive title for display
+           jobs: jobs as Job[] | undefined, // Pass jobs, ensure type matches
+           onPublishDrive: async (finalMap: Record<string, string[]>) => {
+            if (drive_id) {
+              try {
+                  // Directly call the modified handlePublishDrive from the hook
+                  await driveManagement.handlePublishDrive(drive_id, finalMap); 
+                  setPublishDriveModal(false); // Close on success
+              } catch (publishError) {
+                  console.error("Publish failed in page:", publishError); 
+               setPublishDriveModal(false); // Close modal after attempting publish
+              }
+           }},
+    
+        };
 
     const generalDetailsProps = {
         drive,
@@ -172,14 +187,6 @@ export default function Edit() {
         setFormLink: setDriveFormLink,
     };
 
-    const publishDriveModalProps = {
-        isOpen: publishDriveModal,
-        onClose: modalHandlers.publish.close,
-        onPublishDrive: modalHandlers.publish.submit,
-        jobs,
-        students,
-
-    };
 
     const addCompanyModalProps = {
         isOpen: addCompanyModal,
@@ -380,3 +387,4 @@ export default function Edit() {
         </div>
       );
 }
+

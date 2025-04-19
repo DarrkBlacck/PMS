@@ -11,7 +11,7 @@ import {
   updateDriveAPI, addRequirementAPI, fetchRequirementsByJobAPI, updateRequirementAPI, 
   publishDriveAPI,
   fetchStudentsAPI,
-  fetchEligibleStudentsforJobAPI
+  setEligibleStudentsforJobAPI,
 } from "./API";
 
 import { Drive, Company, Job, Requirement, ProgressTracker, ActionStates } from "./types";
@@ -21,7 +21,6 @@ export const useDriveManagement = () => {
     const router = useRouter();
 
     const [students, setStudents] = useState<Student[]>([]);
-    const [jobEligibleStudents, setJobEligibleStudents] = useState<Student[]>([]);
     
     // Drive states
     const [drive, setDrive] = useState<Drive | undefined>();
@@ -88,7 +87,7 @@ export const useDriveManagement = () => {
     const [actionStates, setActionStates] = useState<ActionStates>({
         addingDrive: false,
         updatingDrive: false,
-        publishingDrive: false,
+        // publishingDrive: false,
         deletingDrive: false,
         addingCompany: false,
         updatingCompany: false,
@@ -760,37 +759,51 @@ export const useDriveManagement = () => {
         requiredCertifications, languageRequirements, fetchRequirementsByJob, handleUpdateRequirement
     ]);
 
-    const handlePublishDrive = useCallback(async (driveId: string) => {
-        try {
-            setLoading(true);
-    
-            await publishDriveAPI(driveId);
-        } catch (err: unknown) {
-            console.error("Error in handlingPublishDrive:", {
-                message: (err as Error).message,
-                stack: (err as Error).stack
-            });
-            setError((err as Error).message);
-        } finally {
-            setLoading(false);
-        }
-    }, []); 
+    // Inside useDriveManagement.ts
 
-    const handlefetchEligibleStudentsforJob = useCallback(async (job_id: string) => {
-        try {
-            setLoading(true);
-            const response = await fetchEligibleStudentsforJobAPI(job_id);
-            setJobEligibleStudents(response);
-        } catch (err: unknown) {
-            console.error("Error in fetching eligible students for the job", {
-                message: (err as Error).message,
-                stack: (err as Error).stack
-            });
-            setError((err as Error).message);
-        } finally {
-            setLoading(false);
-        }
-    }, []); 
+const handlePublishDrive = useCallback(async (driveId: string, finalStudentMap: Record<string, string[]>) => {
+    // Use startAction or setLoading as appropriate
+    // startAction('publishingDrive'); 
+    setLoading(true); 
+    setError(""); // Clear previous errors
+
+    try {
+        // --- Step 1: Update eligible students for each job ---
+        const jobUpdatePromises = Object.entries(finalStudentMap).map(([jobId, studentList]) => {
+            console.log(`Updating job ${jobId} with eligible students:`, studentList);
+            // Assuming updateJobAPI exists and can update specific fields
+            // The second argument is the JobUpdate payload
+            return setEligibleStudentsforJobAPI(jobId, studentList ); 
+        });
+
+        // Wait for all job updates to complete
+        await Promise.all(jobUpdatePromises);
+        console.log("All jobs updated successfully with eligible students.");
+
+        // --- Step 2: Mark the drive as published ---
+        console.log(`Publishing drive ${driveId}`);
+        await publishDriveAPI(driveId); // This just sets the 'published' flag on the drive
+        console.log(`Drive ${driveId} published successfully.`);
+
+        // Optional: Add success feedback or navigation here
+        // router.push("/faculty/drives"); // Example navigation
+
+    } catch (err: unknown) {
+        console.error("Error during publishing process:", {
+            message: (err as Error).message,
+            stack: (err as Error).stack
+        });
+        setError(`Publishing failed: ${(err as Error).message}`);
+        // Re-throw if the calling component needs to know about the error
+        throw err; 
+    } finally {
+        setLoading(false);
+        // Reset action state if using startAction
+        // setActionStates(prev => ({ ...prev, publishingDrive: false }));
+    }
+// Add dependencies: updateJobAPI, publishDriveAPI, setLoading, setError etc.
+}, [ setLoading, setError /*, other dependencies */ ]); 
+
 
     
 
@@ -854,7 +867,7 @@ export const useDriveManagement = () => {
                 setLoading(true);
                 if (actionStates.addingDrive) await handleAddDrive();
                 if (actionStates.updatingDrive && drive_id) await handleUpdateDrive(drive_id);
-                if (actionStates.publishingDrive && drive_id) await handlePublishDrive(drive_id)
+                // if (actionStates.publishingDrive && drive_id) await handlePublishDrive(drive_id, finalMap)
                 if (actionStates.deletingDrive && drive_id) await handleDeleteDrive(drive_id);
                 if (actionStates.addingCompany && drive_id) await handleAddCompany();
                 if (actionStates.updatingCompany && company_id) await handleUpdateCompany(company_id);
@@ -875,7 +888,6 @@ export const useDriveManagement = () => {
                 setActionStates({
                     addingDrive: false,
                     updatingDrive: false,
-                    publishingDrive: false,
                     deletingDrive: false,
                     addingCompany: false,
                     updatingCompany: false,
@@ -895,7 +907,7 @@ export const useDriveManagement = () => {
         }
     }, [
         actionStates, drive_id, company_id, job_id, jobTitle, jobExperience,
-        handleAddDrive, handleUpdateDrive, handlePublishDrive, handleDeleteDrive,
+        handleAddDrive, handleUpdateDrive, handleDeleteDrive,
         handleAddCompany, handleUpdateCompany, handleDeleteJobsByDriveCompany,
         handleDeleteDriveCompanyByCompany, fetchCompaniesByDrive,
         handleAddJob, handleUpdateJob, handleDeleteJob, handleAddRequirement
@@ -942,7 +954,6 @@ export const useDriveManagement = () => {
     return {
 
         students, handleFetchStudents, 
-        handlefetchEligibleStudentsforJob, jobEligibleStudents,
 
         // Drive states
         drive, setDrive,
@@ -954,6 +965,7 @@ export const useDriveManagement = () => {
         application_deadline, setApplicationDeadline,
         additional_instructions, setAdditionalInstructions,
         driveform_link, setDriveFormLink,
+        handlePublishDrive,
 
         // Company states
         drive_companies,
@@ -1011,7 +1023,6 @@ export const useDriveManagement = () => {
         // Action handlers
         startAddingDrive: () => startAction('addingDrive'),
         startUpdatingDrive: () => startAction('updatingDrive'),
-        startPublishingDrive: () => startAction('publishingDrive'),
         startDeletingDrive: () => startAction('deletingDrive'),
         startAddingCompany: () => startAction('addingCompany'),
         startUpdatingCompany: () => startAction('updatingCompany'),

@@ -1,3 +1,4 @@
+from time import strftime
 from fastapi import FastAPI, HTTPException, status, APIRouter
 from pms.models.job import Job, JobUpdate
 from pymongo import ReturnDocument
@@ -150,4 +151,20 @@ async def get_eligible_students_for_job(job_id: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occurred while fetching eligible students: {str(e)}"
+        )
+
+@router.patch("/{job_id}/set-eligible")
+async def set_eligible_students_for_job(job_id: str, studentList: List[str]):
+    try:
+        await job_mgr.set_eligible_students_for_job(job_id, studentList)
+        return {"message": "Eligible students updated successfully"}    
+    
+    except HTTPException as http_exc:
+        raise http_exc
+
+    except Exception as e:
+        print(f"Error setting eligible students for job {job_id}: {e}") 
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred while setting eligible students: {str(e)}"
         )

@@ -43,6 +43,7 @@ export interface Job {
     contact_email?: string;
     additional_instructions?: string;
     form_link?: string;
+    eligible_students?: string[];
 }
 
 export interface Requirement {
@@ -70,7 +71,6 @@ export interface ProgressTracker {
 export interface ActionStates {
     addingDrive: boolean;
     updatingDrive: boolean;
-    publishingDrive: boolean;
     deletingDrive: boolean;
     addingCompany: boolean;
     updatingCompany: boolean;

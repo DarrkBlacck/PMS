@@ -367,3 +367,17 @@ export const publishDriveAPI = async (driveId: string) => {
     return await response.json();
 
 };
+
+export const setEligibleStudentsforJobAPI = async (job_id: string, studentList: string[]) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/job/${job_id}/set-eligible`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(studentList),
+    });
+    if (!response.ok) {
+        throw new Error(`Server returned with an error: ${response.status}`);
+    }
+    return await response.json();
+};

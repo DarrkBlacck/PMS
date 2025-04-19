@@ -21,6 +21,7 @@ class Drive(BaseModel):
     additional_instructions: Optional[str] = None
     form_link: Optional[str] = None
     published: Optional[bool] = False
+    eligible_students: Optional[List[str]]=[]
 
 
 class DriveUpdate(BaseModel):
@@ -36,3 +37,5 @@ class DriveUpdate(BaseModel):
         additional_instructions: Optional[str] = None
         form_link: Optional[str] = None
         published: Optional[bool] =None
+        eligible_students: Optional[List[str]]= None
+

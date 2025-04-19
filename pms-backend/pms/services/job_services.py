@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import logging
 from pms.models.job import Job, JobUpdate
 from pymongo import ReturnDocument
 from typing import Any, List, Dict
@@ -284,5 +285,25 @@ class JobMgr:
             print(f"Error in get_eligible_students for job {job_id}: {str(e)}")
             # Re-raise the exception to be caught by the route handler
             raise Exception(f"Failed to determine eligible students: {str(e)}")
+    
+    async def set_eligible_students_for_job(self,job_id: str, studentList: List[str]):
+        try:
+            response = await self.job_collection.find_one_and_update(
+                {"_id" : ObjectId(job_id)},
+                {"$set": {"eligible_students": studentList}},  # Use $set for clarity
+                return_document= ReturnDocument.AFTER
+            )
+            if not response:
+                raise ValueError("Job not found")
+            response["_id"] = str(response["_id"]) 
+            return response  # Return the updated document
+        except ValueError as ve:
+            logging.error(f"ValueError: {str(ve)}")
+            raise
+        except Exception as e:
+            # Log the error for debugging
+            print(f"Error in setting eligible students for job {job_id}: {str(e)}")
+            # Re-raise the exception to be caught by the route handler
+            raise Exception(f"Failed to set eligible students: {str(e)}")
 
 job_mgr = JobMgr()
